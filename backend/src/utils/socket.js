@@ -6,9 +6,21 @@ let io;
 const LOG_FILE = path.join(process.cwd(), 'logs', 'email.log');
 
 const writeToLog = (msg) => {
-  const timestamp = new Date().toISOString();
-  fs.appendFileSync(LOG_FILE, `[Socket-Log] [${timestamp}] ${msg}\n`);
-  console.log(msg);
+  try {
+    const timestamp = new Date().toISOString();
+    
+    // Đảm bảo thư mục logs tồn tại
+    const logDir = path.join(process.cwd(), 'logs');
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+
+    fs.appendFileSync(LOG_FILE, `[Socket-Log] [${timestamp}] ${msg}\n`);
+    console.log(msg);
+  } catch (err) {
+    // Nếu lỗi khi ghi file (ví dụ trên môi trường cloud) thì chỉ cần console.log là đủ, tránh làm sập server
+    console.log(`[Socket-Log-Console] ${msg}`);
+  }
 };
 
 export const initSocket = (server) => {
