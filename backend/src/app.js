@@ -12,7 +12,7 @@ const server = http.createServer(app)
 // ĐẶT CORS LÊN ĐẦU TIÊN (Trước mọi middleware khác)
 app.use(cors({
   origin: '*', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   credentials: true
 }))
