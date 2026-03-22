@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
 
@@ -16,7 +16,7 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:3000/api/users/login', { email, password });
+      const res = await api.post('/users/login', { email, password });
       const { token, user } = res.data.data;
 
       if (user.role !== 'ADMIN' && user.role !== 'STAFF') {

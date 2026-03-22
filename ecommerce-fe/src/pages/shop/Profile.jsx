@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { User, Bell, Package, Gift, Heart, LogOut, ChevronRight, AlertCircle, ShoppingBag, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -28,15 +28,12 @@ const Profile = () => {
     }
 
     setUser(JSON.parse(storedUser));
-    fetchNotifications(token);
+    fetchNotifications();
   }, [navigate]);
 
-  const fetchNotifications = async (token) => {
+  const fetchNotifications = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-      const res = await axios.get(`${apiUrl}/customers/notifications`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/customers/notifications');
       setNotifications(res.data?.data || []);
     } catch (err) {
       console.error("Lỗi fetch notifications:", err);
