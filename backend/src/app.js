@@ -9,14 +9,17 @@ import { initSocket } from './utils/socket.js'
 const app = express()
 const server = http.createServer(app)
 
+// ĐẶT CORS LÊN ĐẦU TIÊN (Trước mọi middleware khác)
+app.use(cors({
+  origin: '*', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  credentials: true
+}))
+
 // Khởi chạy Socket.io
 initSocket(server)
 
-app.use(cors({
-  origin: '*', // Sau này bạn có thể thay bằng domain frontend của VERCEL để bảo mật hơn
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}))
 app.use(express.json())
 
 app.use('/api', routes)
