@@ -297,10 +297,18 @@ const Checkout = () => {
                   { label: 'City / District', name: 'city', placeholder: 'Ho Chi Minh City', col: 2 },
                 ].map(field => (
                   <div key={field.name} className={field.col === 2 ? 'sm:col-span-2' : ''}>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">{field.label}</label>
-                    <input type={field.name === 'email' ? 'email' : 'text'} name={field.name}
-                      placeholder={field.placeholder} value={form[field.name]} onChange={handleChange}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm" />
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      {field.label} <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type={field.name === 'email' ? 'email' : 'text'} 
+                      name={field.name}
+                      required
+                      placeholder={field.placeholder} 
+                      value={form[field.name]} 
+                      onChange={handleChange}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm" 
+                    />
                   </div>
                 ))}
                 <div className="sm:col-span-2">

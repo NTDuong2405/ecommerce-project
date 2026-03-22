@@ -67,7 +67,9 @@ const Register = () => {
         <form className="mt-8 space-y-5" onSubmit={handleRegister} autoComplete="off">
           <div className="space-y-4">
             <div className="relative">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                Email Address <span className="text-red-500">*</span>
+              </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
@@ -111,7 +113,9 @@ const Register = () => {
             </div>
 
             <div className="relative">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Password</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                Password <span className="text-red-500">*</span>
+              </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
@@ -127,7 +131,9 @@ const Register = () => {
             </div>
 
             <div className="relative">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Confirm Password</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                Confirm Password <span className="text-red-500">*</span>
+              </label>
               <div className="relative">
                 <CheckCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input

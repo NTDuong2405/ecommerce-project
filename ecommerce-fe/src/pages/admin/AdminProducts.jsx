@@ -276,7 +276,9 @@ const AdminProducts = () => {
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Tên sản phẩm (*)</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Tên sản phẩm <span className="text-red-500">*</span>
+                </label>
                 <input 
                   type="text" 
                   required
@@ -298,7 +300,9 @@ const AdminProducts = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Giá (*)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Giá <span className="text-red-500">*</span>
+                  </label>
                   <input 
                     type="number" 
                     required
@@ -309,7 +313,9 @@ const AdminProducts = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Số lượng Kho (*)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Số lượng Kho <span className="text-red-500">*</span>
+                  </label>
                   <input 
                     type="number" 
                     required
