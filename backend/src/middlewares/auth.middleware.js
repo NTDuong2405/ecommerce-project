@@ -1,6 +1,7 @@
 import { verifyToken } from '../utils/jwt.js'
+import { prisma } from '../config/prisma.js'
 
-export const authMiddleware = (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1]
 
@@ -10,12 +11,23 @@ export const authMiddleware = (req, res, next) => {
 
     const decoded = verifyToken(token)
 
-    req.user = decoded
+    // KIỂM TRA THỰC TẾ TRONG DATABASE (Phát hiện User hết hạn/bị xóa)
+    const userId = decoded.id || decoded.userId || decoded.sub;
+    if (userId) {
+      const userExists = await prisma.user.findUnique({ where: { id: Number(userId) } });
+      if (!userExists) {
+        return res.status(401).json({ message: 'User no longer exists. Please relogin.' });
+      }
+      // Gán lại thông tin User thực tế cho req.user để dùng cho Staff/Admin check
+      req.user = userExists;
+    } else {
+      req.user = decoded;
+    }
 
     next()
   } catch (error) {
     res.status(401).json({
-      message: 'Unauthorized'
+      message: 'Unauthorized (Invalid token)'
     })
   }
 }
