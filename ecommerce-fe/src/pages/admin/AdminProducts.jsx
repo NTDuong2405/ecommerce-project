@@ -19,6 +19,7 @@ const AdminProducts = () => {
   const [currentProduct, setCurrentProduct] = useState({ name: '', description: '', price: 0, stock: 0, images: [] });
   const [newImageUrl, setNewImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // State quản lý Modal Xác nhận Xóa
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
@@ -106,7 +107,16 @@ const AdminProducts = () => {
   // Nút Lưu trong Modal
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!currentProduct.name || !currentProduct.price) return showToast("Vui lòng điền đủ tên và giá!", "error");
+    
+    // Validation
+    const newErrors = {};
+    if (!currentProduct.name) newErrors.name = true;
+    if (!currentProduct.price) newErrors.price = true;
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return showToast("Vui lòng điền đủ tên và giá!", "error");
+    }
 
     setSaving(true);
     try {
@@ -274,7 +284,7 @@ const AdminProducts = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4">
+            <form noValidate onSubmit={handleSave} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Tên sản phẩm <span className="text-red-500">*</span>
@@ -282,9 +292,14 @@ const AdminProducts = () => {
                 <input 
                   type="text" 
                   required
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                    errors.name ? 'border-red-500 focus:ring-red-500 bg-red-50' : 'border-slate-200 focus:ring-primary-500'
+                  }`}
                   value={currentProduct.name}
-                  onChange={e => setCurrentProduct({...currentProduct, name: e.target.value})}
+                  onChange={e => {
+                    setCurrentProduct({...currentProduct, name: e.target.value});
+                    if (errors.name) setErrors({...errors, name: false});
+                  }}
                 />
               </div>
 
@@ -307,9 +322,14 @@ const AdminProducts = () => {
                     type="number" 
                     required
                     min={0}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-bold text-slate-900"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all font-bold ${
+                        errors.price ? 'border-red-500 focus:ring-red-500 bg-red-50' : 'border-slate-200 focus:ring-primary-500'
+                    }`}
                     value={currentProduct.price}
-                    onChange={e => setCurrentProduct({...currentProduct, price: e.target.value})}
+                    onChange={e => {
+                        setCurrentProduct({...currentProduct, price: e.target.value});
+                        if (errors.price) setErrors({...errors, price: false});
+                    }}
                   />
                 </div>
                 <div>

@@ -13,19 +13,34 @@ const Register = () => {
     birthday: ''
   });
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
+  const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    
+    // Custom Validation
+    const newErrors = {};
+    if (!formData.email) newErrors.email = true;
+    if (!formData.password) newErrors.password = true;
+    if (!formData.confirmPassword) newErrors.confirmPassword = true;
+    if (!agreed) newErrors.agreed = true;
+    
+    if (Object.keys(newErrors).length > 0) {
+      setValidationErrors(newErrors);
+      if (newErrors.agreed) toast.error("Vui lòng đồng ý với điều khoản!");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Mật khẩu xác nhận không khớp.');
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
 
     try {
       await api.post('/users/register', { 
@@ -64,7 +79,7 @@ const Register = () => {
           </div>
         )}
 
-        <form className="mt-8 space-y-5" onSubmit={handleRegister} autoComplete="off">
+        <form noValidate className="mt-8 space-y-5" onSubmit={handleRegister} autoComplete="off">
           <div className="space-y-4">
             <div className="relative">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
@@ -76,8 +91,15 @@ const Register = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
+                  onChange={(e) => {
+                    setFormData({...formData, email: e.target.value});
+                    if (validationErrors.email) setValidationErrors({...validationErrors, email: false});
+                  }}
+                  className={`block w-full pl-12 pr-4 py-3.5 border rounded-2xl focus:outline-none focus:ring-2 transition-all text-slate-900 ${
+                    validationErrors.email 
+                    ? 'border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:bg-white'
+                  }`}
                   placeholder="name@example.com"
                   autoComplete="off"
                 />
@@ -122,8 +144,15 @@ const Register = () => {
                   type="password"
                   required
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
+                  onChange={(e) => {
+                    setFormData({...formData, password: e.target.value});
+                    if (validationErrors.password) setValidationErrors({...validationErrors, password: false});
+                  }}
+                  className={`block w-full pl-12 pr-4 py-3.5 border rounded-2xl focus:outline-none focus:ring-2 transition-all text-slate-900 ${
+                    validationErrors.password 
+                    ? 'border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:bg-white'
+                  }`}
                   placeholder="••••••••"
                   autoComplete="new-password"
                 />
@@ -140,8 +169,15 @@ const Register = () => {
                   type="password"
                   required
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
+                  onChange={(e) => {
+                    setFormData({...formData, confirmPassword: e.target.value});
+                    if (validationErrors.confirmPassword) setValidationErrors({...validationErrors, confirmPassword: false});
+                  }}
+                  className={`block w-full pl-12 pr-4 py-3.5 border rounded-2xl focus:outline-none focus:ring-2 transition-all text-slate-900 ${
+                    validationErrors.confirmPassword 
+                    ? 'border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'bg-slate-50 border-slate-200 focus:ring-emerald-500 focus:bg-white'
+                  }`}
                   placeholder="••••••••"
                   autoComplete="new-password"
                 />
@@ -149,9 +185,18 @@ const Register = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-slate-500 px-1">
-            <input type="checkbox" required className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-slate-300 rounded" />
-            <p>Tôi đồng ý với <Link to="#" className="font-semibold text-emerald-600 underline decoration-emerald-500/30">Điều khoản</Link> của VibeCart.</p>
+          <div className={`flex items-center gap-2 text-sm px-1 py-1 rounded-lg transition-colors ${validationErrors.agreed ? 'bg-red-50' : 'text-slate-500'}`}>
+            <input 
+              type="checkbox" 
+              required 
+              checked={agreed}
+              onChange={(e) => {
+                setAgreed(e.target.checked);
+                if (validationErrors.agreed) setValidationErrors({...validationErrors, agreed: false});
+              }}
+              className={`h-4 w-4 text-emerald-600 focus:ring-emerald-500 rounded ${validationErrors.agreed ? 'border-red-500' : 'border-slate-300'}`} 
+            />
+            <p className={validationErrors.agreed ? 'text-red-600 font-bold' : ''}>Tôi đồng ý với <Link to="#" className="font-semibold text-emerald-600 underline decoration-emerald-500/30">Điều khoản</Link> của VibeCart.</p>
           </div>
 
           <button

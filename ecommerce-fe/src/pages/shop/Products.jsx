@@ -180,6 +180,13 @@ const ProductCard = ({ product }) => {
             OUT OF STOCK
           </div>
         )}
+
+        {/* Discount Tag */}
+        {product.discountPercentage > 0 && (
+          <div className="absolute top-3 left-3 bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-lg animate-bounce">
+            -{product.discountPercentage}%
+          </div>
+        )}
         <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300">
           <div className="w-full py-2.5 bg-white/95 backdrop-blur-md text-slate-900 font-bold rounded-xl shadow-lg text-center text-sm">
             View Details →
@@ -189,10 +196,15 @@ const ProductCard = ({ product }) => {
       <div className="p-5 flex flex-col flex-1">
         <div className="text-xs font-semibold text-primary-600 uppercase tracking-wider mb-1.5">Essential</div>
         <h3 className="text-base font-bold text-slate-900 font-display mb-2 line-clamp-2">{product.name}</h3>
-        <div className="mt-auto flex items-center justify-between">
-          <div className="text-xl font-bold text-slate-900">${product.price.toFixed(2)}</div>
+        <div className="mt-auto">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="text-xl font-bold text-slate-900">${product.price.toFixed(2)}</div>
+            {product.discountPercentage > 0 && (
+              <div className="text-sm text-slate-400 line-through">${product.originalPrice?.toFixed(2)}</div>
+            )}
+          </div>
           {product.stock > 0 && product.stock <= 10 && (
-            <span className="text-xs text-orange-600 font-semibold">Only {product.stock} left</span>
+            <span className="text-xs text-orange-600 font-semibold italic">Only {product.stock} left!</span>
           )}
         </div>
       </div>

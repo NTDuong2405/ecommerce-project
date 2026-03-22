@@ -103,6 +103,7 @@ const Home = () => {
                  rating={4.8} 
                  reviews={124}
                  stock={product.stock}
+                 product={product}
               />
             ))}
           </div>
@@ -122,7 +123,7 @@ const FeatureItem = ({ icon, title, desc }) => (
   </div>
 );
 
-const ProductCard = ({ id, image, title, price, category, rating, reviews, stock }) => (
+const ProductCard = ({ id, image, title, price, category, rating, reviews, stock, product }) => (
   <Link to={`/product/${id}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-100">
     <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
       <img 
@@ -141,6 +142,13 @@ const ProductCard = ({ id, image, title, price, category, rating, reviews, stock
         <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${stock > 0 ? 'bg-emerald-500' : 'bg-white'}`}></div>
         {stock > 0 ? `In Stock: ${stock}` : 'Out of Stock'}
       </div>
+
+      {/* Discount Tag */}
+      {product.discountPercentage > 0 && (
+        <div className="absolute top-4 right-14 bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-lg animate-bounce">
+          -{product.discountPercentage}% OFF
+        </div>
+      )}
       
       {/* Quick Add Button overlay */}
       <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
@@ -156,9 +164,14 @@ const ProductCard = ({ id, image, title, price, category, rating, reviews, stock
     <div className="p-6 flex flex-col flex-1">
       <div className="text-xs font-semibold text-primary-600 uppercase tracking-wider mb-2">{category}</div>
       <h3 className="text-lg font-bold text-slate-900 font-display mb-2 truncate">{title}</h3>
-      <div className="mt-auto flex items-center justify-between">
-        <div className="text-xl font-bold text-slate-900">${price.toFixed(2)}</div>
-        <div className="text-sm text-slate-500">({reviews})</div>
+      <div className="mt-auto">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="text-xl font-bold text-slate-900">${price.toFixed(2)}</div>
+          {product.discountPercentage > 0 && (
+            <div className="text-sm text-slate-400 line-through">${product.originalPrice?.toFixed(2)}</div>
+          )}
+        </div>
+        <div className="text-xs text-slate-500">({reviews} reviews)</div>
       </div>
     </div>
   </Link>

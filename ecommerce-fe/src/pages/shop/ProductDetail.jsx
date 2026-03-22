@@ -194,8 +194,12 @@ const ProductDetail = () => {
           {/* Price */}
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-extrabold text-slate-900 font-display">${product.price.toFixed(2)}</span>
-            <span className="text-slate-400 line-through text-lg">${(product.price * 1.2).toFixed(2)}</span>
-            <span className="px-2 py-0.5 bg-red-100 text-red-600 text-sm font-bold rounded-full">-17%</span>
+            {product.discountPercentage > 0 && (
+              <>
+                <span className="text-slate-400 line-through text-lg">${product.originalPrice?.toFixed(2)}</span>
+                <span className="px-2 py-0.5 bg-red-100 text-red-600 text-sm font-bold rounded-full">-{product.discountPercentage}%</span>
+              </>
+            )}
           </div>
 
           {/* Divider */}

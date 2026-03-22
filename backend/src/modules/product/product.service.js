@@ -1,5 +1,47 @@
 import { prisma } from "../../config/prisma.js"
 
+// Helper: Áp dụng giảm giá từ chiến dịch Marketing đang chạy
+const applyMarketingDiscount = async (products) => {
+  const now = new Date();
+  // Tìm khuyến mãi chung (userId null) và đang active, ko tính birthday (định danh bằng code ko bắt đầu bằng BDAY)
+  const activePromo = await prisma.promotion.findFirst({
+    where: {
+      isActive: true,
+      startDate: { lte: now },
+      endDate: { gte: now },
+      userId: null,
+      NOT: {
+        code: { startsWith: 'BDAY' }
+      }
+    },
+    orderBy: { discount: 'desc' } // Lấy cái giảm sâu nhất nếu có nhiều campaign
+  });
+
+  const discount = activePromo ? activePromo.discount : 0;
+
+  const processProduct = (p) => {
+    if (!p) return p;
+    if (discount > 0) {
+      return {
+        ...p,
+        originalPrice: p.price,
+        price: p.price * (1 - discount / 100),
+        discountPercentage: discount
+      };
+    }
+    return {
+        ...p,
+        originalPrice: p.price,
+        discountPercentage: 0
+    };
+  };
+
+  if (Array.isArray(products)) {
+    return products.map(processProduct);
+  }
+  return processProduct(products);
+};
+
 export const getList = async (query) => {
   const page = Number(query.page) || 1
   const limit = Number(query.limit) || 10
@@ -64,8 +106,10 @@ export const getList = async (query) => {
     prisma.product.count({ where })
   ])
 
+  const processedData = await applyMarketingDiscount(data);
+
   return {
-    data,
+    data: processedData,
     meta: {
       page,
       limit,
@@ -75,12 +119,14 @@ export const getList = async (query) => {
 }
 
 export const getDetail = async (id) => {
-  return await prisma.product.findUnique({
+  const product = await prisma.product.findUnique({
     where: { id: Number(id) },
     include: {
       images: true
     }
-  })
+  });
+
+  return await applyMarketingDiscount(product);
 }
 
 // ✅ [SERVICE] Xử lý nghiệp vụ Thêm Sản phẩm

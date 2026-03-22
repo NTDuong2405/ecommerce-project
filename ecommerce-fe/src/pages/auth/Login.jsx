@@ -8,13 +8,25 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    
+    // Custom Validation
+    const newErrors = {};
+    if (!email) newErrors.email = true;
+    if (!password) newErrors.password = true;
+    
+    if (Object.keys(newErrors).length > 0) {
+      setValidationErrors(newErrors);
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await api.post('/users/login', { email, password });
@@ -58,7 +70,7 @@ const Login = () => {
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form noValidate className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="space-y-4">
             <div className="relative">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
@@ -71,8 +83,15 @@ const Login = () => {
                   required
                   autoComplete="off"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-slate-900"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (validationErrors.email) setValidationErrors({...validationErrors, email: false});
+                  }}
+                  className={`block w-full pl-12 pr-4 py-3.5 border rounded-2xl focus:outline-none focus:ring-2 transition-all text-slate-900 ${
+                    validationErrors.email 
+                    ? 'border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'bg-slate-50 border-slate-200 focus:ring-primary-500 focus:bg-white'
+                  }`}
                   placeholder="name@example.com"
                 />
               </div>
@@ -89,8 +108,15 @@ const Login = () => {
                   required
                   autoComplete="new-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-slate-900"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (validationErrors.password) setValidationErrors({...validationErrors, password: false});
+                  }}
+                  className={`block w-full pl-12 pr-4 py-3.5 border rounded-2xl focus:outline-none focus:ring-2 transition-all text-slate-900 ${
+                    validationErrors.password 
+                    ? 'border-red-500 focus:ring-red-500 bg-red-50' 
+                    : 'bg-slate-50 border-slate-200 focus:ring-primary-500 focus:bg-white'
+                  }`}
                   placeholder="••••••••"
                 />
               </div>

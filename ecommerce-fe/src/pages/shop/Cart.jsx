@@ -61,7 +61,12 @@ const Cart = () => {
                 <Link to={`/product/${item.productId}`} className="hover:text-primary-600 transition-colors">
                   <h3 className="font-bold text-slate-900 font-display truncate">{item.name}</h3>
                 </Link>
-                <p className="text-slate-400 text-sm mt-0.5">Unit price: ${item.price.toFixed(2)}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-slate-900 font-bold text-sm">${item.price.toFixed(2)}</span>
+                  {item.discountPercentage > 0 && (
+                    <span className="text-slate-400 text-xs line-through">${item.originalPrice?.toFixed(2)}</span>
+                  )}
+                </div>
               </div>
 
               {/* Quantity stepper */}

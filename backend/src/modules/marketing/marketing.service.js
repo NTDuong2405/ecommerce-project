@@ -54,7 +54,8 @@ export const validateCoupon = async (code) => {
       code: code,
       isActive: true,
       startDate: { lte: now },
-      endDate: { gte: now }
+      endDate: { gte: now },
+      userId: { not: null } // Chỉ cho phép áp dụng mã cá nhân/sinh nhật thủ công
     }
   });
 
@@ -128,15 +129,14 @@ export const sendBirthdayWish = async (userId) => {
 
 export const getAvailablePromotions = async (userId) => {
   const now = new Date();
+  if (!userId) return []; // Khách vãng lai không có voucher cá nhân
+
   return await prisma.promotion.findMany({
     where: {
       isActive: true,
       startDate: { lte: now },
       endDate: { gte: now },
-      OR: [
-        { userId: null }, // Voucher chung
-        { userId: userId } // Voucher riêng
-      ]
+      userId: userId // Chỉ lấy voucher đã gán cho User cụ thể (Sinh nhật, Khách quen)
     },
     orderBy: { createdAt: 'desc' }
   });
