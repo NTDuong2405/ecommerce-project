@@ -45,8 +45,9 @@ import { prisma } from '../../config/prisma.js';
 
 export const getMyChats = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?.userId;
-    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    console.log("🕵️‍♂️ [DEBUG] getMyChats req.user:", JSON.stringify(req.user));
+    const userId = req.user?.id || req.user?.userId || req.user?.sub;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized (No user ID)' });
     
     // Tìm ID của ADMIN để lấy hội thoại chung
     const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
@@ -68,8 +69,9 @@ export const getChatsByGuestId = async (req, res) => {
 
 export const sendChatFromMember = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?.userId;
-    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    console.log("🕵️‍♂️ [DEBUG] sendChatFromMember req.user:", JSON.stringify(req.user));
+    const userId = req.user?.id || req.user?.userId || req.user?.sub;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized (No user ID)' });
 
     // Tin nhắn từ khách luôn gửi tới Admin
     const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });

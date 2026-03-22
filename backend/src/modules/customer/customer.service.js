@@ -77,23 +77,28 @@ export const getCustomers = async (query = {}) => {
 
 
 export const sendChat = async ({ senderId, receiverId, content, guestId }) => {
-  console.log(`💾 [Service] Saving chat: From ${senderId} To ${receiverId} | Guest: ${guestId}`);
+  const sId = senderId ? Number(senderId) : null;
+  const rId = receiverId ? Number(receiverId) : null;
+
+  console.log(`💾 [Service] Preparing chat: From ${sId} (orig: ${senderId}) To ${rId} (orig: ${receiverId}) | Guest: ${guestId}`);
   
+  // Kiểm tra nếu cả dúng và sai đều NaN thì ép về null để Prisma không lỗi
   const message = await prisma.chatMessage.create({
     data: {
-      senderId: senderId ? Number(senderId) : null,
-      receiverId: receiverId ? Number(receiverId) : null,
+      senderId: (sId && !isNaN(sId)) ? sId : null,
+      receiverId: (rId && !isNaN(rId)) ? rId : null,
       guestId: guestId ? String(guestId) : null,
-      content
+      content: content || "(Trống)"
     }
   });
 
   // PHÁT THÔNG BÁO CHO ADMIN NẾU CUSTOMER GỬI TIN NHẮN TỚI
-  if (String(receiverId) === "1") {
+  // Nếu người nhận không phải Admin (ID != 1), ta vẫn check role admin trong controller nếu cần
+  if (String(rId) === "1") {
     const customerId = senderId || guestId;
     await createAdminNotification({
       title: 'New Chat!',
-      content: `Msg from: ${guestId ? 'Guest_' + guestId : 'Customer_#' + senderId}: ${content.slice(0, 30)}...`,
+      content: `Msg from: ${guestId ? 'Guest_' + guestId : 'Customer_#' + senderId}: ${content?.slice(0, 30)}...`,
       type: 'CHAT',
       path: `/admin/customers?customerId=${customerId}`
     });
