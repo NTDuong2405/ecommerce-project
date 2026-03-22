@@ -16,7 +16,7 @@ export const authMiddleware = async (req, res, next) => {
     if (userId) {
       const userExists = await prisma.user.findUnique({ where: { id: Number(userId) } });
       if (!userExists) {
-        return res.status(401).json({ message: 'User no longer exists. Please relogin.' });
+        return res.status(401).json({ message: 'Tài khoản không tồn tại hoặc đã bị xóa. Vui lòng đăng nhập lại!' });
       }
       // Gán lại thông tin User thực tế cho req.user để dùng cho Staff/Admin check
       req.user = userExists;
@@ -27,7 +27,7 @@ export const authMiddleware = async (req, res, next) => {
     next()
   } catch (error) {
     res.status(401).json({
-      message: 'Unauthorized (Invalid token)'
+      message: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại!'
     })
   }
 }

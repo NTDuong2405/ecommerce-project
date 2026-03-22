@@ -35,13 +35,13 @@ export const loginUser = async ({ email, password }) => {
   })
 
   if (!user) {
-    throw new Error('User not found')
+    throw new Error('Tài khoản của bạn chưa được đăng ký!')
   }
 
   const isMatch = await bcrypt.compare(password, user.password)
 
   if (!isMatch) {
-    throw new Error('Wrong password')
+    throw new Error('Mật khẩu không chính xác!')
   }
 
   const token = generateToken({
