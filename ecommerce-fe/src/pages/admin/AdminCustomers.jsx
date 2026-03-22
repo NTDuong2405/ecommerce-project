@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../../utils/api';
-import { Search, MessageCircle, Gift, CheckCircle, X, Send, AlertTriangle } from 'lucide-react';
+import { Search, MessageCircle, Gift, CheckCircle, X, Send, AlertTriangle, UserCog, Cake, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 import { useSearchParams } from 'react-router-dom';
+import Pagination from '../../components/Pagination';
 
 const AdminCustomers = () => {
   const [searchParams] = useSearchParams();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState(null);
 
   // Lắng nghe điều hướng từ Chuông thông báo
   useEffect(() => {
@@ -53,6 +56,12 @@ const AdminCustomers = () => {
     type: 'PROMO'
   });
 
+  // Edit User state
+  const [editData, setEditData] = useState({
+    phone: '',
+    birthday: ''
+  });
+
   // Bộ đếm tin nhắn chưa đọc cho từng khách - Cố định qua Reload
   const [unreadMap, setUnreadMap] = useState(() => {
     try {
@@ -69,7 +78,7 @@ const AdminCustomers = () => {
 
   useEffect(() => {
     fetchCustomers();
-  }, []);
+  }, [page, searchTerm]);
 
   // Lắng nghe tin nhắn Real-time để cập nhật UI ngay lập tức
   useEffect(() => {
@@ -108,10 +117,10 @@ const AdminCustomers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const res = await api.get('/customers');
-      // Đảm bảo luôn set một Array để tránh crash .filter
-      const data = Array.isArray(res.data) ? res.data : (res.data?.data || []);
-      setCustomers(data);
+      setLoading(true);
+      const res = await api.get(`/customers?page=${page}&limit=10&search=${searchTerm}`);
+      setCustomers(res.data?.data?.data || res.data?.data || []);
+      setMeta(res.data?.data?.meta || null);
     } catch (err) {
       console.error("Lỗi fetch khách hàng:", err);
       setCustomers([]); // Reset về array trống nếu lỗi
@@ -169,11 +178,28 @@ const AdminCustomers = () => {
     }
   };
 
-  const filteredCustomers = customers.filter(c => 
-    c.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const openEditModal = (user) => {
+    setSelectedUser(user);
+    setEditData({
+      phone: user.phone || '',
+      birthday: user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : ''
+    });
+    setActiveModal('EDIT');
+  };
 
-  if (loading) return <div className="p-10 text-center text-slate-500">Loading customers...</div>;
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    try {
+      await api.patch(`/customers/${selectedUser.id}`, editData);
+      setActiveModal(null);
+      fetchCustomers();
+      alert('Cập nhật thông tin khách hàng thành công!');
+    } catch (err) {
+      alert('Lỗi cập nhật thông tin');
+    }
+  };
+
+  if (loading && customers.length === 0) return <div className="p-10 text-center text-slate-500">Loading customers...</div>;
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -210,7 +236,7 @@ const AdminCustomers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredCustomers.map((user) => (
+              {customers.map((user) => (
                 <tr key={user?.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-6 py-4 font-bold text-slate-900 text-xs">#{String(user?.id || '').slice(-4)}</td>
                   <td className="px-6 py-4">
@@ -221,9 +247,29 @@ const AdminCustomers = () => {
                       <div>
                         <div className="font-bold text-slate-800 flex items-center gap-2">
                           {user?.email}
-                          {user?.isGuest && <span className="bg-slate-200 text-slate-500 text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Guest</span>}
+                          {user?.isGuest ? (
+                            <span className="bg-slate-200 text-slate-500 text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Guest</span>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                                {user.totalSpent >= 1000 ? (
+                                    <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold shadow-sm">💎 VIP DIAMOND</span>
+                                ) : user.totalSpent >= 500 ? (
+                                    <span className="bg-amber-100 text-amber-700 text-[9px] px-2 py-0.5 rounded-full font-bold border border-amber-200">🏆 GOLD</span>
+                                ) : user.totalSpent >= 100 ? (
+                                    <span className="bg-slate-100 text-slate-600 text-[9px] px-2 py-0.5 rounded-full font-bold border border-slate-200">⭐ SILVER</span>
+                                ) : (
+                                    <span className="bg-blue-50 text-blue-600 text-[9px] px-2 py-0.5 rounded-full font-bold">Standard</span>
+                                )}
+                            </div>
+                          )}
                         </div>
                         <div className="text-xs text-slate-500">Joined {user?.createdAt ? new Date(user?.createdAt).toLocaleDateString() : 'Unknown'}</div>
+                        {(user?.phone || user?.birthday) && (
+                          <div className="flex gap-2 mt-1.5 flex-wrap">
+                            {user.phone && <span className="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-md flex items-center gap-1 font-medium"><Phone size={10} /> {user.phone}</span>}
+                            {user.birthday && <span className="text-[10px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded-md flex items-center gap-1 font-medium"><Cake size={10} /> {new Date(user.birthday).toLocaleDateString()}</span>}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -237,6 +283,12 @@ const AdminCustomers = () => {
                         <div className="text-xs font-bold text-blue-600">{user?._count?.chatMessages || 0}</div>
                         <div className="text-[10px] text-slate-400 uppercase">Chats</div>
                       </div>
+                      {!user.isGuest && (
+                        <div className="text-center border-l border-slate-100 pl-4">
+                            <div className="text-xs font-bold text-emerald-600">${user.totalSpent?.toFixed(2) || '0.00'}</div>
+                            <div className="text-[10px] text-slate-400 uppercase font-medium">Spent</div>
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-xs text-slate-500">
@@ -244,6 +296,13 @@ const AdminCustomers = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
+                      <button 
+                        onClick={() => openEditModal(user)}
+                        className="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors group/btn relative"
+                      >
+                        <UserCog size={20} />
+                        <span className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">Edit Profile</span>
+                      </button>
                       <button 
                         onClick={() => openChat(user)}
                         className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors group/btn relative"
@@ -272,7 +331,67 @@ const AdminCustomers = () => {
             </tbody>
           </table>
         </div>
+        <Pagination meta={meta} onPageChange={(p) => setPage(p)} />
       </div>
+
+      {/* EDIT MODAL */}
+      {activeModal === 'EDIT' && selectedUser && (
+        <div 
+          onClick={() => setActiveModal(null)}
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in-up"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+          >
+            <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <div>
+                <h3 className="text-xl font-bold text-slate-800">Cập nhật Thông tin</h3>
+                <p className="text-sm text-slate-500">{selectedUser?.email}</p>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="text-slate-400 hover:text-slate-600">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleUpdateUser} className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <Phone size={16} className="text-slate-400" /> Số điện thoại
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="09xx xxx xxx"
+                  className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                  value={editData.phone}
+                  onChange={e => setEditData({...editData, phone: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <Cake size={16} className="text-slate-400" /> Ngày sinh
+                </label>
+                <input 
+                  type="date" 
+                  className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                  value={editData.birthday}
+                  onChange={e => setEditData({...editData, birthday: e.target.value})}
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button type="button" onClick={() => setActiveModal(null)} className="flex-1 px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50">
+                  Hủy
+                </button>
+                <button type="submit" className="flex-1 bg-primary-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-600/20">
+                  Lưu thay đổi
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* CHAT MODAL */}
       {activeModal === 'CHAT' && selectedUser && (

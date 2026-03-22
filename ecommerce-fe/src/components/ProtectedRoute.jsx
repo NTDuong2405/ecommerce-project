@@ -11,9 +11,12 @@ const ProtectedRoute = ({ role }) => {
     return <Navigate to="/admin/login" replace />;
   }
 
-  // 2. Kiểm tra Role (nếu yêu cầu)
-  if (role && user?.role !== role) {
-    return <Navigate to="/" replace />;
+  // 2. Kiểm tra Role (hỗ trợ cả Array và String đơn lẻ)
+  if (role) {
+    const allowedRoles = Array.isArray(role) ? role : [role];
+    if (!allowedRoles.includes(user?.role)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <Outlet />;

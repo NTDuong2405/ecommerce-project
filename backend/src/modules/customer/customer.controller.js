@@ -3,7 +3,7 @@ import { emitChatMessage } from '../../utils/socket.js';
 
 export const getCustomers = async (req, res) => {
   try {
-    const data = await customerService.getCustomers();
+    const data = await customerService.getCustomers(req.query);
     res.json({ message: 'Get customers success', data });
   } catch (err) { res.status(400).json({ message: err.message }); }
 }
@@ -114,6 +114,15 @@ export const markAdminNotificationRead = async (req, res) => {
   try {
     const data = await customerService.markAdminAsRead(req.params.notifId);
     res.json({ message: 'Mark admin as read success', data });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+export const updateCustomer = async (req, res) => {
+  try {
+    const data = await customerService.updateCustomer(req.params.id, req.body);
+    res.json({ message: 'Update customer success', data });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
 });
 
 // Thêm Token vào Header cho mọi request
@@ -30,10 +30,25 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Nếu Unauthorized (Token sai/hết hạn), đá về trang Login
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      window.location.href = '/admin/login';
+      // Xác định đang ở khu vực nào (Admin hay Shop)
+      const isAdminPath = window.location.pathname.startsWith('/admin');
+      const isAlreadyOnAdminLogin = window.location.pathname === '/admin/login';
+      const isAlreadyOnShopLogin = window.location.pathname === '/login';
+      
+      if (isAdminPath) {
+        // Phe Admin: Xóa admin data & về login admin (để bảo mật)
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        
+        if (!isAlreadyOnAdminLogin) {
+          window.location.href = '/admin/login';
+        }
+      } else {
+        // Phe Shop: CHỈ XÓA DATA, KHÔNG TỰ ĐỘNG CHUYỂN TRANG
+        // Để khách vãng lai vẫn xem được hàng bình thường
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
     return Promise.reject(error);
   }

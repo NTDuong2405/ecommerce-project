@@ -98,27 +98,69 @@ const ProductDetail = () => {
         {/* ── Image Gallery ── */}
         <div className="space-y-4">
           <div className="relative aspect-square rounded-3xl overflow-hidden bg-slate-100 shadow-lg group">
-            <img
-              src={images[selectedImage]}
-              alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
+            {/* Navigation buttons for slider */}
+            {images.length > 1 && (
+              <>
+                <button 
+                  onClick={() => setSelectedImage(prev => (prev - 1 + images.length) % images.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-slate-800 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white z-10"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button 
+                  onClick={() => setSelectedImage(prev => (prev + 1) % images.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-slate-800 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white z-10"
+                >
+                  <ChevronLeft size={20} className="rotate-180" />
+                </button>
+              </>
+            )}
+
+            <div className="w-full h-full relative">
+              {images.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={product.name}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${selectedImage === idx ? 'opacity-100 z-0' : 'opacity-0 -z-10'}`}
+                />
+              ))}
+            </div>
+
+            {/* Indicator Dots */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                {images.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`h-1.5 rounded-full transition-all ${selectedImage === idx ? 'w-6 bg-primary-600' : 'w-1.5 bg-white/60'}`}
+                  />
+                ))}
+              </div>
+            )}
+
             {!inStock && (
-              <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center">
-                <span className="bg-white text-slate-900 font-bold px-6 py-2 rounded-full">Out of Stock</span>
+              <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center z-20">
+                <span className="bg-white text-slate-900 font-bold px-6 py-2 rounded-full shadow-xl animate-bounce">Out of Stock</span>
               </div>
             )}
           </div>
-          {/* Thumbnails */}
+
+          {/* Thumbnails Collection */}
           {images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-1">
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide py-1">
               {images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(idx)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-primary-500 shadow-md' : 'border-slate-200 hover:border-slate-300'}`}
+                  className={`flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all duration-300 relative ${selectedImage === idx ? 'border-primary-500 shadow-lg scale-95 ring-4 ring-primary-50' : 'border-slate-200 hover:border-slate-300'}`}
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />
+                  {selectedImage === idx && (
+                    <div className="absolute inset-0 bg-primary-600/10 flex items-center justify-center">
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

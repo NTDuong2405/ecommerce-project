@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Search, Eye, Filter, CheckCircle, Package, Truck, XCircle } from 'lucide-react';
+import { Search, Eye, Filter, CheckCircle, Package, Truck, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import Pagination from '../../components/Pagination';
 
 const AdminOrders = () => {
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('orderId') || '');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // Lắng nghe URL param để tự động lọc đơn hàng
   useEffect(() => {
@@ -36,8 +40,9 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/orders/all');
-      setOrders(res.data?.data || []);
+      const res = await api.get(`/orders/all?page=${page}&limit=10&search=${searchTerm}`);
+      setOrders(res.data?.data?.data || res.data?.data || []);
+      setMeta(res.data?.data?.meta || null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -47,7 +52,7 @@ const AdminOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [page, searchTerm]);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -59,11 +64,7 @@ const AdminOrders = () => {
     }
   };
 
-  const filteredOrders = orders.filter(order => 
-    String(order.id).includes(searchTerm) || 
-    order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.customerEmail?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  if (loading && orders.length === 0) return <div className="p-10 text-center text-slate-500">Loading orders...</div>;
 
   return (
     <div className="space-y-6 animate-fade-in-up relative">
@@ -127,10 +128,10 @@ const AdminOrders = () => {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr><td colSpan="6" className="text-center py-6 text-slate-500">Loading orders...</td></tr>
-              ) : filteredOrders.length === 0 ? (
+              ) : orders.length === 0 ? (
                 <tr><td colSpan="6" className="text-center py-6 text-slate-500">No orders found.</td></tr>
               ) : (
-                filteredOrders.map((order) => (
+                orders.map((order) => (
                   <tr key={order.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-6 py-4 font-bold text-slate-900">
                       <span className="text-primary-600">#{order.id}</span>
@@ -157,7 +158,10 @@ const AdminOrders = () => {
                         <option value="CANCELLED">Cancelled</option>
                       </select>
                       
-                      <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-white hover:bg-primary-600 rounded-lg transition-all border border-primary-200 hover:border-transparent">
+                      <button 
+                        onClick={() => setSelectedOrder(order)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-white hover:bg-primary-600 rounded-lg transition-all border border-primary-200 hover:border-transparent"
+                      >
                         <Eye size={16} />
                         View
                       </button>
@@ -168,7 +172,194 @@ const AdminOrders = () => {
             </tbody>
           </table>
         </div>
+        <Pagination meta={meta} onPageChange={(p) => setPage(p)} />
       </div>
+
+      {/* --- ORDER DETAILS MODAL --- */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+            onClick={() => setSelectedOrder(null)}
+          ></div>
+          
+          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-fade-in-up">
+            <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <div>
+                <div className="flex items-center gap-3">
+                  <h3 className="text-2xl font-bold text-slate-900">Order #{selectedOrder.id}</h3>
+                  {getStatusBadge(selectedOrder.status)}
+                </div>
+                <p className="text-sm text-slate-500 mt-1">Placed on {new Date(selectedOrder.createdAt).toLocaleString('vi-VN')}</p>
+              </div>
+              <button 
+                onClick={() => setSelectedOrder(null)} 
+                className="p-2 hover:bg-white rounded-xl text-slate-400 hover:text-slate-600 transition-all shadow-sm"
+              >
+                <XCircle size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Column 1 & 2: Items List */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="bg-slate-50/50 px-6 py-3 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      Items Ordered
+                    </div>
+                    <div className="divide-y divide-slate-50">
+                      {selectedOrder.items.map((item, idx) => (
+                        <div key={idx} className="p-6 flex items-center gap-4 hover:bg-slate-50/50 transition-colors">
+                          <div className="w-16 h-16 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex-shrink-0">
+                            <img 
+                              src={item.product?.images?.[0]?.url || 'https://via.placeholder.com/150'} 
+                              alt={item.product?.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-slate-900 truncate">{item.product?.name}</h4>
+                            <p className="text-sm text-slate-500 mt-0.5">Price: ${item.price.toFixed(2)}</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold text-slate-900">x{item.quantity}</div>
+                            <div className="text-sm font-bold text-primary-600 mt-0.5">${(item.price * item.quantity).toFixed(2)}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="bg-slate-50/30 p-6 space-y-2 border-t border-slate-100">
+                      <div className="flex justify-between text-sm text-slate-500">
+                        <span>Subtotal</span>
+                        <span>${(selectedOrder.totalPrice - (selectedOrder.shippingPrice || 0)).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-slate-500">
+                        <span>Shipping ({selectedOrder.shippingMethod || 'Standard'})</span>
+                        <span className={selectedOrder.shippingPrice === 0 ? 'text-emerald-600 font-medium' : ''}>
+                           {selectedOrder.shippingPrice === 0 ? 'Free' : `$${selectedOrder.shippingPrice?.toFixed(2)}`}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-lg font-bold text-slate-900 pt-2 border-t border-slate-100">
+                        <span>Total Amount</span>
+                        <span className="text-primary-600">${selectedOrder.totalPrice.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-xl flex items-start gap-3">
+                    <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Truck size={18} />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-blue-900 text-sm">Ghi chú từ khách hàng</h5>
+                      <p className="text-sm text-blue-700 mt-0.5 leading-relaxed">
+                        {selectedOrder.note || "Không có ghi chú đặc biệt cho đơn hàng này."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 3: Customer Info */}
+                <div className="space-y-6">
+                  <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm space-y-4">
+                    <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Customer Details</h5>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-xs">
+                          {selectedOrder.customerName?.[0]?.toUpperCase() || 'G'}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">{selectedOrder.customerName}</p>
+                          <p className="text-xs text-slate-500">{selectedOrder.customerEmail || 'Guest'}</p>
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-slate-50">
+                        <p className="text-xs text-slate-400 font-medium uppercase">Phone Number</p>
+                        <p className="text-sm text-slate-900 font-bold mt-1">{selectedOrder.customerPhone || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm space-y-4">
+                    <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Shipping Address</h5>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">Address</p>
+                        <p className="text-sm text-slate-900 font-semibold mt-1 leading-relaxed">
+                          {selectedOrder.address}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">City</p>
+                        <p className="text-sm text-slate-900 font-semibold mt-1">{selectedOrder.city}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm space-y-4">
+                    <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Payment Information</h5>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">Method</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-sm font-bold text-slate-900">{selectedOrder.payment?.method || 'N/A'}</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 uppercase">
+                            {selectedOrder.payment?.method === 'COD' ? '💵 COD' : '💳 Online'}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">Status</p>
+                        <span className={`inline-block px-2 py-1 rounded-md text-[10px] font-bold mt-1 ${
+                          selectedOrder.payment?.status === 'SUCCESS' ? 'bg-emerald-100 text-emerald-700' : 
+                          selectedOrder.payment?.status === 'FAILED' ? 'bg-red-100 text-red-700' : 
+                          'bg-amber-100 text-amber-700'
+                        }`}>
+                          {selectedOrder.payment?.status || 'PENDING'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-lg space-y-4">
+                    <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Admin Control</h5>
+                    <div className="space-y-3">
+                      <p className="text-xs text-slate-300">Update Order Status</p>
+                      <select 
+                        value={selectedOrder.status}
+                        onChange={(e) => {
+                          handleStatusChange(selectedOrder.id, e.target.value);
+                          setSelectedOrder({...selectedOrder, status: e.target.value});
+                        }}
+                        className="w-full bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm font-bold"
+                      >
+                        <option value="PENDING">Pending</option>
+                        <option value="CONFIRMED">Confirmed</option>
+                        <option value="SHIPPING">Shipping</option>
+                        <option value="DELIVERED">Delivered</option>
+                        <option value="CANCELLED">Cancelled</option>
+                      </select>
+                      <p className="text-[10px] text-slate-500 leading-tight">
+                        Cập nhật trạng thái này sẽ gửi thông báo và thay đổi hiển thị cho khách hàng.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <button 
+                onClick={() => setSelectedOrder(null)}
+                className="px-6 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-100 transition-all shadow-sm"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

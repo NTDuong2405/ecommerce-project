@@ -2,7 +2,7 @@ import { prisma } from '../../config/prisma.js'
 import { emitStockUpdate, emitNewOrder } from '../../utils/socket.js'
 
 export const createOrder = async (userId, data) => {
-  const { items, totalPrice, customerName, customerEmail, customerPhone, address, city, note } = data;
+  const { items, totalPrice, customerName, customerEmail, customerPhone, address, city, note, shippingMethod, shippingPrice } = data;
 
   if (!items || items.length === 0) {
     throw new Error('No items in order');
@@ -44,6 +44,8 @@ export const createOrder = async (userId, data) => {
         address,
         city,
         note,
+        shippingMethod: shippingMethod || 'Standard Shipping',
+        shippingPrice: Number(shippingPrice) || 0,
         items: {
           create: items.map((item) => ({
             productId: Number(item.productId),
@@ -152,22 +154,48 @@ export const getOrders = async (userId) => {
   })
 }
 
-export const getAllOrders = async () => {
-  return await prisma.order.findMany({
-    include: {
-      user: {
-        select: { id: true, email: true }
-      },
-      items: {
-        include: {
-          product: true
+export const getAllOrders = async (query = {}) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+  const search = query.search ? String(query.search).toLowerCase() : '';
+
+  const where = search ? {
+    OR: [
+      { customerName: { contains: search, mode: 'insensitive' } },
+      { customerEmail: { contains: search, mode: 'insensitive' } },
+      // Nếu search là số, tìm theo ID
+      ...(!isNaN(Number(search)) ? [{ id: Number(search) }] : [])
+    ]
+  } : {};
+
+  const [data, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      skip,
+      take: limit,
+      include: {
+        user: {
+          select: { id: true, email: true }
+        },
+        payment: true,
+        items: {
+          include: {
+            product: true
+          }
         }
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  })
+    }),
+    prisma.order.count({ where })
+  ]);
+
+  return {
+    data,
+    meta: { page, limit, total }
+  };
 }
 
 export const getOrderDetail = async (userId, orderId) => {

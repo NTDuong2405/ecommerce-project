@@ -28,4 +28,15 @@ export const adminMiddleware = (req, res, next) => {
       message: 'Access denied: Admin only'
     })
   }
-}
+}
+
+// Cho phép cả Admin và Nhân viên (Staff) truy cập
+export const staffMiddleware = (req, res, next) => {
+  if (req.user && (req.user.role === 'ADMIN' || req.user.role === 'STAFF')) {
+    next()
+  } else {
+    res.status(403).json({
+      message: 'Access denied: Staff/Admin only'
+    })
+  }
+}

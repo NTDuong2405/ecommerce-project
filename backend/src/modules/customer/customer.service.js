@@ -1,66 +1,78 @@
 import { prisma } from "../../config/prisma.js";
 import { emitChatMessage } from "../../utils/socket.js";
 
-export const getCustomers = async () => {
-  // 1. Lấy Users đăng ký + đếm chat, orders, notifs
-  const users = await prisma.user.findMany({
-    where: { role: 'USER' },
+export const getCustomers = async (query = {}) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+  const search = query.search ? String(query.search).toLowerCase() : '';
+
+  // 1. Lấy Users đăng ký có lọc search
+  const usersRaw = await prisma.user.findMany({
+    where: { 
+      role: 'USER',
+      ...(search && {
+        OR: [
+          { email: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } }
+        ]
+      })
+    },
     select: {
-      id: true,
-      email: true,
-      createdAt: true,
+      id: true, email: true, phone: true, birthday: true, createdAt: true,
       _count: { 
-        select: { 
-          orders: true, 
-          notifications: true,
-          sentMessages: true, 
-          receivedMessages: true 
-        } 
+        select: { orders: true, notifications: true, sentMessages: true, receivedMessages: true } 
       }
     },
     orderBy: { createdAt: 'desc' }
   });
 
-  // 2. Lấy danh sách Guest duy nhất từ ChatMessage
+  // Tính toán thêm số tiền đã mua (Total Spent) cho từng User
+  const users = await Promise.all(usersRaw.map(async (u) => {
+    const aggregate = await prisma.order.aggregate({
+      where: { userId: u.id, status: { not: 'CANCELLED' } }, // Không tính đơn đã hủy
+      _sum: { totalPrice: true }
+    });
+    return {
+      ...u,
+      totalSpent: aggregate._sum.totalPrice || 0
+    };
+  }));
+
+  // 2. Lấy danh sách Guest
   const guestChats = await prisma.chatMessage.findMany({
-    where: { guestId: { not: null } },
+    where: { 
+      guestId: { not: null },
+      ...(search && { 
+        guestId: { contains: search, mode: 'insensitive' } 
+      })
+    },
     distinct: ['guestId'],
-    select: {
-      guestId: true,
-      createdAt: true
-    }
+    select: { guestId: true, createdAt: true },
+    orderBy: { createdAt: 'desc' }
   });
 
-  // 3. Quy đổi Guest thành định dạng giống User để hiển thị
   const guests = await Promise.all(guestChats.map(async (gc) => {
-    const chatCount = await prisma.chatMessage.count({
-      where: { guestId: gc.guestId }
-    });
-    
+    const chatCount = await prisma.chatMessage.count({ where: { guestId: gc.guestId } });
     return {
-      id: gc.guestId,
-      email: `Guest_${gc.guestId}`,
-      createdAt: gc.createdAt,
-      isGuest: true,
-      _count: { 
-        orders: 0, 
-        notifications: 0,
-        chatMessages: chatCount
-      }
+      id: gc.guestId, email: `Guest_${gc.guestId}`, createdAt: gc.createdAt, isGuest: true,
+      _count: { orders: 0, notifications: 0, chatMessages: chatCount }
     };
   }));
 
   const userList = users.map(u => ({ 
-    ...u, 
-    isGuest: false,
-    _count: {
-      ...u._count,
-      chatMessages: u._count.sentMessages + u._count.receivedMessages
-    }
+    ...u, isGuest: false,
+    _count: { ...u._count, chatMessages: u._count.sentMessages + u._count.receivedMessages }
   }));
 
-  // Gộp lại (Users trước, Guests sau)
-  return [...userList, ...guests];
+  const allCustomers = [...userList, ...guests];
+  const total = allCustomers.length;
+  const data = allCustomers.slice(skip, skip + limit);
+
+  return {
+    data,
+    meta: { page, limit, total }
+  };
 }
 
 
@@ -211,4 +223,14 @@ export const createAdminNotification = async ({ title, content, type, path }) =>
   }
 
   return notification;
+}
+
+export const updateCustomer = async (userId, data) => {
+  return await prisma.user.update({
+    where: { id: Number(userId) },
+    data: {
+      phone: data.phone,
+      birthday: data.birthday ? new Date(data.birthday) : null
+    }
+  });
 }

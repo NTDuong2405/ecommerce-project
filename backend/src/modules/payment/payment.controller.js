@@ -75,6 +75,7 @@ const sendSuccessEmail = async (orderId) => {
       subject: `✅ VibeCart – Order #${orderId} Confirmed/Paid!`,
       html: buildOrderConfirmEmail({
         customerName: order.customerName || 'Customer',
+        customerEmail: recipientEmail,
         orderId: order.id,
         items: emailItems,
         totalPrice: subtotal,

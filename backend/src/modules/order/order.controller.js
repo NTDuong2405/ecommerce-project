@@ -53,7 +53,7 @@ export const getOrders = async (req, res) => {
 
 export const getAllOrdersAdmin = async (req, res) => {
   try {
-    const data = await orderService.getAllOrders()
+    const data = await orderService.getAllOrders(req.query)
 
     res.json({
       message: 'Get all orders success',

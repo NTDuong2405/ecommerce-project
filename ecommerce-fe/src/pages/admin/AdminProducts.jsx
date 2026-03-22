@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Plus, Search, Edit2, Trash2, Filter, X, AlertTriangle, CheckCircle, Package } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Filter, X, AlertTriangle, CheckCircle, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
+import Pagination from '../../components/Pagination';
 
 const AdminProducts = () => {
   // --- STATES ---
   const [searchTerm, setSearchTerm] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState(null);
   const { socket } = useSocket();
 
   // States quản lý Modal Thêm/Sửa sản phẩm
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
-  const [currentProduct, setCurrentProduct] = useState({ name: '', description: '', price: 0, stock: 0, imageUrl: '' });
+  const [currentProduct, setCurrentProduct] = useState({ name: '', description: '', price: 0, stock: 0, images: [] });
+  const [newImageUrl, setNewImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
 
   // State quản lý Modal Xác nhận Xóa
@@ -31,8 +35,9 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/products?search=${searchTerm}`);
+      const res = await api.get(`/products?search=${searchTerm}&page=${page}&limit=10`);
       setProducts(res.data?.data?.data || res.data?.data || []);
+      setMeta(res.data?.data?.meta || null);
     } catch (err) {
       console.error("Lỗi khi fetch sản phẩm:", err);
     } finally {
@@ -42,7 +47,7 @@ const AdminProducts = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm]);
+  }, [searchTerm, page]);
 
   useEffect(() => {
     // --- Tích hợp Socket.io Real-time tập trung ---
@@ -78,7 +83,8 @@ const AdminProducts = () => {
   // Mở modal thêm mới
   const handleOpenAdd = () => {
     setModalMode('add');
-    setCurrentProduct({ name: '', description: '', price: '', stock: 0, imageUrl: '' });
+    setCurrentProduct({ name: '', description: '', price: '', stock: 0, images: [] });
+    setNewImageUrl('');
     setIsModalOpen(true);
   };
 
@@ -91,8 +97,9 @@ const AdminProducts = () => {
       description: product.description || '', 
       price: product.price, 
       stock: product.stock,
-      imageUrl: product.images?.[0]?.url || '' 
+      images: product.images?.map(img => img.url) || []
     });
+    setNewImageUrl('');
     setIsModalOpen(true);
   };
 
@@ -108,7 +115,7 @@ const AdminProducts = () => {
         description: currentProduct.description,
         price: Number(currentProduct.price),
         stock: Number(currentProduct.stock),
-        images: currentProduct.imageUrl ? [currentProduct.imageUrl] : []
+        images: currentProduct.images
       };
 
       if (modalMode === 'add') {
@@ -249,6 +256,7 @@ const AdminProducts = () => {
             </tbody>
           </table>
         </div>
+        <Pagination meta={meta} onPageChange={(p) => setPage(p)} />
       </div>
 
       {/* --- CẤU TRÚC MODAL CHI TIẾT SẢN PHẨM --- */}
@@ -313,15 +321,47 @@ const AdminProducts = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Link Ảnh (URL)</label>
-                <input 
-                  type="url" 
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  value={currentProduct.imageUrl}
-                  onChange={e => setCurrentProduct({...currentProduct, imageUrl: e.target.value})}
-                />
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-slate-700">Hình ảnh sản phẩm</label>
+                
+                {/* List current images */}
+                <div className="grid grid-cols-4 gap-3">
+                    {currentProduct.images.map((img, idx) => (
+                        <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden border border-slate-200">
+                            <img src={img} className="w-full h-full object-cover" />
+                            <button 
+                                type="button"
+                                onClick={() => setCurrentProduct({...currentProduct, images: currentProduct.images.filter((_, i) => i !== idx)})}
+                                className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <X size={12} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Add new image URL */}
+                <div className="flex gap-2">
+                    <input 
+                    type="url" 
+                    placeholder="Dán link ảnh tại đây (https://...)"
+                    className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                    value={newImageUrl}
+                    onChange={e => setNewImageUrl(e.target.value)}
+                    />
+                    <button 
+                        type="button"
+                        onClick={() => {
+                            if (newImageUrl.trim()) {
+                                setCurrentProduct({...currentProduct, images: [...currentProduct.images, newImageUrl.trim()]});
+                                setNewImageUrl('');
+                            }
+                        }}
+                        className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all"
+                    >
+                        Thêm
+                    </button>
+                </div>
               </div>
 
               <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">

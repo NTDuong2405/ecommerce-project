@@ -34,7 +34,9 @@ const Checkout = () => {
         customerPhone: form.phone,
         address: form.address,
         city: form.city,
-        note: form.note
+        note: form.note,
+        shippingMethod: totalPrice >= 150 ? 'Free Shipping' : 'Standard Delivery',
+        shippingPrice: shippingFee
       };
 
       const orderRes = await axios.post('http://localhost:3000/api/orders', orderData);

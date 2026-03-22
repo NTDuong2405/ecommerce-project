@@ -13,8 +13,16 @@ const AdminDashboard = () => {
     recentOrders: []
   });
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    // Lấy thông tin role từ localStorage
+    const userStr = localStorage.getItem('admin_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      setIsAdmin(user.role === 'ADMIN');
+    }
+
     const fetchStats = async () => {
       try {
         const res = await api.get('/dashboard/stats');
@@ -27,6 +35,7 @@ const AdminDashboard = () => {
     };
     fetchStats();
   }, []);
+
   return (
     <div className="space-y-8 animate-fade-in-up">
       <div>
@@ -39,15 +48,19 @@ const AdminDashboard = () => {
         <div className="text-slate-500 animate-pulse text-center py-6">Đang tải biểu đồ...</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} trend="Real-time" isPositive={true} icon={<DollarSign size={24} />} color="bg-emerald-100 text-emerald-600" />
+          {isAdmin && (
+            <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} trend="Real-time" isPositive={true} icon={<DollarSign size={24} />} color="bg-emerald-100 text-emerald-600" />
+          )}
           <StatCard title="Active Orders" value={stats.totalOrders} trend="Real-time" isPositive={true} icon={<ShoppingBag size={24} />} color="bg-blue-100 text-blue-600" />
           <StatCard title="Customers" value={stats.totalCustomers} trend="Real-time" isPositive={true} icon={<Users size={24} />} color="bg-purple-100 text-purple-600" />
-          <StatCard title="Conversion Rate" value="3.2%" trend="Giả lập" isPositive={false} icon={<Activity size={24} />} color="bg-orange-100 text-orange-600" />
+          {isAdmin && (
+            <StatCard title="Conversion Rate" value="3.2%" trend="Giả lập" isPositive={false} icon={<Activity size={24} />} color="bg-orange-100 text-orange-600" />
+          )}
         </div>
       )}
 
-      {/* Charts Section */}
-      {!loading && stats.chartData && stats.chartData.length > 0 && (
+      {/* Charts Section - Chỉ hiện cho Admin */}
+      {!loading && isAdmin && stats.chartData && stats.chartData.length > 0 && (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div className="mb-6 flex justify-between items-center">
             <div>

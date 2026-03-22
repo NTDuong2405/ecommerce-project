@@ -63,7 +63,7 @@ export const sendMail = async ({ to, subject, html }) => {
 };
 
 // ─── Template: Xác nhận đặt hàng ─────────────────────────────────
-export const buildOrderConfirmEmail = ({ customerName, orderId, items, totalPrice, shippingFee, paymentMethod, address }) => {
+export const buildOrderConfirmEmail = ({ customerName, customerEmail, orderId, items, totalPrice, shippingFee, paymentMethod, address }) => {
   const grandTotal = totalPrice + shippingFee;
   const methodLabels = {
     COD: '💵 Cash on Delivery',
@@ -177,12 +177,29 @@ export const buildOrderConfirmEmail = ({ customerName, orderId, items, totalPric
             </td>
           </tr>
 
+          <!-- Tracking Section (NEW) -->
+          <tr>
+            <td style="padding:32px 40px 0;">
+              <div style="padding:24px;background:#fdf4ff;border-radius:20px;border:2px dashed #d8b4fe;text-align:center;">
+                <div style="font-size:20px;margin-bottom:12px;">🚚</div>
+                <h3 style="margin:0 0 8px;color:#1e293b;font-size:18px;font-weight:700;">Track Your Package</h3>
+                <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.5;">
+                  Use your Order ID <strong style="color:#d946ef;">#${orderId}</strong> and your email address to see live updates on our tracking page.
+                </p>
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/track-order?orderId=${orderId}&contact=${customerEmail || ''}" 
+                  style="display:inline-block;background:#7c3aed;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:12px;font-weight:700;font-size:14px;transition:all 0.2s;">
+                  Go to Tracking Page →
+                </a>
+              </div>
+            </td>
+          </tr>
+
           <!-- CTA Button -->
           <tr>
             <td style="padding:32px 40px;text-align:center;">
               <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" 
                 style="display:inline-block;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#ffffff;text-decoration:none;padding:16px 40px;border-radius:100px;font-weight:700;font-size:15px;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(99,102,241,0.4);">
-                Continue Shopping →
+                Continue Shopping
               </a>
             </td>
           </tr>

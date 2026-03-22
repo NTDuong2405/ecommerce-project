@@ -2,7 +2,7 @@ import { prisma } from '../../config/prisma.js'
 import bcrypt from 'bcrypt'
 import { generateToken } from '../../utils/jwt.js'
 
-export const createUser = async ({ email, password }) => {
+export const createUser = async ({ email, password, phone, birthday, role }) => {
   // check user tồn tại
   const existingUser = await prisma.user.findUnique({
     where: { email }
@@ -19,7 +19,10 @@ export const createUser = async ({ email, password }) => {
   const user = await prisma.user.create({
     data: {
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      phone: phone || null,
+      birthday: birthday ? new Date(birthday) : null,
+      role: role || 'USER'
     }
   })
 

@@ -19,7 +19,7 @@ const AdminLogin = () => {
       const res = await axios.post('http://localhost:3000/api/users/login', { email, password });
       const { token, user } = res.data.data;
 
-      if (user.role !== 'ADMIN') {
+      if (user.role !== 'ADMIN' && user.role !== 'STAFF') {
         throw new Error('Bạn không có quyền truy cập vào trang này!');
       }
 
@@ -66,6 +66,7 @@ const AdminLogin = () => {
                 <input 
                   type="email" 
                   required
+                  autoComplete="off"
                   placeholder="admin@vibecart.com"
                   className="w-full bg-slate-900/50 border border-slate-700 text-white pl-12 pr-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
                   value={email}
@@ -81,6 +82,7 @@ const AdminLogin = () => {
                 <input 
                   type="password" 
                   required
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   className="w-full bg-slate-900/50 border border-slate-700 text-white pl-12 pr-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
                   value={password}

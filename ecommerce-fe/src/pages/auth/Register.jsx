@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Mail, Lock, ArrowRight, UserPlus, AlertCircle, CheckCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, UserPlus, AlertCircle, CheckCircle, Phone, Cake } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phone: '',
+    birthday: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,9 @@ const Register = () => {
     try {
       await axios.post('http://localhost:3000/api/users/register', { 
         email: formData.email, 
-        password: formData.password 
+        password: formData.password,
+        phone: formData.phone,
+        birthday: formData.birthday
       });
       
       // Navigate to login after success
@@ -57,7 +61,7 @@ const Register = () => {
           </div>
         )}
 
-        <form className="mt-8 space-y-5" onSubmit={handleRegister}>
+        <form className="mt-8 space-y-5" onSubmit={handleRegister} autoComplete="off">
           <div className="space-y-4">
             <div className="relative">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
@@ -70,6 +74,35 @@ const Register = () => {
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
                   placeholder="name@example.com"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+
+            <div className="relative">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="text"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
+                  placeholder="09xx xxx xxx"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+
+            <div className="relative">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Birthday</label>
+              <div className="relative">
+                <Cake className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="date"
+                  value={formData.birthday}
+                  onChange={(e) => setFormData({...formData, birthday: e.target.value})}
+                  className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
                 />
               </div>
             </div>
@@ -85,6 +118,7 @@ const Register = () => {
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
                   className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
                   placeholder="••••••••"
+                  autoComplete="new-password"
                 />
               </div>
             </div>
@@ -100,6 +134,7 @@ const Register = () => {
                   onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                   className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900"
                   placeholder="••••••••"
+                  autoComplete="new-password"
                 />
               </div>
             </div>
