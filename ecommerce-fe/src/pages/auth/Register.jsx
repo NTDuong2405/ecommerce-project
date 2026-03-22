@@ -62,8 +62,8 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 animate-fade-in-up">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8 sm:py-12">
+      <div className="max-w-md w-full space-y-8 bg-white p-6 sm:p-10 rounded-3xl shadow-2xl border border-slate-100 animate-fade-in-up">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4">
             <UserPlus size={32} />

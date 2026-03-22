@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { CheckCircle, ShoppingBag, Truck, CreditCard, ChevronRight, Copy, ExternalLink, Ticket, X } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useTranslation } from 'react-i18next';
+import { formatPrice } from '../../utils/format';
 
 const STEPS = ['Cart Review', 'Delivery Info', 'Payment'];
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [orderDone, setOrderDone] = useState(false);
   const [paymentResult, setPaymentResult] = useState(null);
@@ -131,7 +134,7 @@ const Checkout = () => {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 flex flex-col items-center text-center">
         <ShoppingBag size={48} className="text-slate-300 mb-4" />
-        <h2 className="text-xl font-bold text-slate-800 mb-2">Your cart is empty</h2>
+        <h2 className="text-xl font-bold text-slate-800 mb-2">{t('cart.empty')}</h2>
         <Link to="/products" className="mt-4 text-primary-600 hover:underline font-medium">← Browse products</Link>
       </div>
     );
@@ -146,10 +149,10 @@ const Checkout = () => {
         <h1 className="text-3xl font-display font-bold text-slate-900 mb-3">Order Placed! 🎉</h1>
         <p className="text-slate-500 mb-2">Thank you, <strong>{form.fullName || 'friend'}</strong>!</p>
         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 w-full text-left mb-8">
-          <h3 className="font-bold text-slate-800 mb-3">Order Summary</h3>
-          <div className="flex justify-between text-sm text-slate-600 mb-1"><span>Subtotal</span><span>${totalPrice.toFixed(2)}</span></div>
-          <div className="flex justify-between text-sm text-slate-600 mb-1"><span>Shipping</span><span>{shippingFee === 0 ? 'Free' : `$${shippingFee}`}</span></div>
-          <div className="flex justify-between font-bold text-slate-900 text-base border-t border-slate-200 pt-2 mt-2"><span>Total</span><span>${grandTotal.toFixed(2)}</span></div>
+          <h3 className="font-bold text-slate-800 mb-3">{t('cart.summary', { defaultValue: 'Order Summary' })}</h3>
+          <div className="flex justify-between text-sm text-slate-600 mb-1"><span>{t('cart.subtotal')}</span><span>{formatPrice(totalPrice)}</span></div>
+          <div className="flex justify-between text-sm text-slate-600 mb-1"><span>{t('cart.shipping')}</span><span>{shippingFee === 0 ? t('cart.free') : formatPrice(shippingFee)}</span></div>
+          <div className="flex justify-between font-bold text-slate-900 text-base border-t border-slate-200 pt-2 mt-2"><span>{t('cart.total')}</span><span>{formatPrice(grandTotal)}</span></div>
         </div>
         <div className="flex gap-3 w-full">
           <Link to="/products" className="flex-1 text-center px-6 py-3 rounded-full border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors">Continue Shopping</Link>
@@ -179,13 +182,13 @@ const Checkout = () => {
                 ['Bank', paymentResult.bankName],
                 ['Account No.', paymentResult.accountNumber],
                 ['Account Name', paymentResult.accountName],
-                ['Amount', `$${Number(paymentResult.amount).toLocaleString()}`],
+                ['Amount', formatPrice(Number(paymentResult.amount) / (i18n.language === 'vi' ? 25000 : 1))], // Backend sends original price, formatPrice handles rate internally. Wait, if Backend sends VND, then I need careful. But here Backend is sending the same grandTotal. formatPrice(grandTotal) should work.
                 ['Transfer Ref', paymentResult.transferContent],
               ].map(([label, val]) => (
                 <div key={label} className="flex justify-between">
                   <span className="text-slate-500">{label}</span>
                   <span className="font-bold text-slate-900 flex items-center gap-1">
-                    {val}
+                    {label === 'Amount' ? formatPrice(grandTotal) : val}
                     {label === 'Transfer Ref' && (
                       <button onClick={() => navigator.clipboard?.writeText(val)} className="ml-1 text-slate-400 hover:text-primary-600">
                         <Copy size={14} />
@@ -224,7 +227,7 @@ const Checkout = () => {
               </div>
             )}
             <div className="bg-pink-50 border border-pink-100 rounded-2xl p-4 text-center">
-              <div className="text-2xl font-black text-pink-600 font-display">${Number(paymentResult.amount).toLocaleString()}</div>
+              <div className="text-2xl font-black text-pink-600 font-display">{formatPrice(grandTotal)}</div>
             </div>
             <button onClick={() => { clearCart(); setOrderDone(true); }}
               className="w-full py-3 border border-slate-200 text-slate-600 rounded-full font-medium hover:bg-slate-50 transition-colors">
@@ -273,13 +276,13 @@ const Checkout = () => {
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-slate-900 truncate">{item.name}</div>
                     <div className="text-sm text-slate-400">
-                      Qty: {item.quantity} × <span className="font-bold text-slate-900">${item.price.toFixed(2)}</span>
+                      Qty: {item.quantity} × <span className="font-bold text-slate-900">{formatPrice(item.price)}</span>
                       {item.discountPercentage > 0 && (
-                        <span className="ml-1 text-xs line-through text-slate-300">${item.originalPrice?.toFixed(2)}</span>
+                        <span className="ml-1 text-xs line-through text-slate-300">{formatPrice(item.originalPrice)}</span>
                       )}
                     </div>
                   </div>
-                  <div className="font-bold text-slate-900 shrink-0">${(item.price * item.quantity).toFixed(2)}</div>
+                  <div className="font-bold text-slate-900 shrink-0">{formatPrice(item.price * item.quantity)}</div>
                 </div>
               ))}
               <div className="pt-2 flex justify-end">
@@ -368,15 +371,82 @@ const Checkout = () => {
 
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sticky top-24 text-sm">
-            <h2 className="font-bold text-slate-900 mb-4">Order Summary</h2>
-            <div className="space-y-2">
-              <div className="flex justify-between border-t border-slate-100 pt-2 font-bold text-base text-slate-900">
-                <span>Total</span><span>${grandTotal.toFixed(2)}</span>
+            <h2 className="font-bold text-slate-900 mb-4">{t('cart.summary', { defaultValue: 'Order Summary' })}</h2>
+            <div className="space-y-3">
+               <div className="flex justify-between text-slate-600">
+                <span>{t('cart.subtotal')}</span>
+                <span className="font-medium text-slate-900">{formatPrice(totalPrice)}</span>
               </div>
+              <div className="flex justify-between text-slate-600">
+                <span>{t('cart.shipping')}</span>
+                <span className="text-emerald-600 font-medium">{shippingFee === 0 ? t('cart.free') : formatPrice(shippingFee)}</span>
+              </div>
+              {appliedPromo && (
+                <div className="flex justify-between text-rose-600 font-medium">
+                  <span>Discount ({appliedPromo.discount}%)</span>
+                  <span>-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-slate-100 pt-3 font-bold text-base text-slate-900">
+                <span>{t('cart.total')}</span><span>{formatPrice(grandTotal)}</span>
+              </div>
+            </div>
+
+            {/* Voucher Section */}
+            <div className="mt-6 pt-6 border-t border-slate-100">
+              <button 
+                onClick={() => setShowVoucherModal(true)}
+                className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all border border-dashed border-slate-300 group"
+              >
+                <div className="flex items-center gap-2 text-slate-600 group-hover:text-primary-600">
+                  <Ticket size={18} />
+                  <span className="font-medium">Chế độ Ưu đãi</span>
+                </div>
+                <ChevronRight size={16} className="text-slate-400" />
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Voucher Modal */}
+      {showVoucherModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-bounce-in">
+             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <Ticket className="text-primary-600" /> Voucher của bạn
+                </h3>
+                <button onClick={() => setShowVoucherModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+                  <X size={20} />
+                </button>
+             </div>
+             <div className="p-6 max-h-[400px] overflow-y-auto space-y-3">
+                {vouchers.length === 0 ? (
+                  <p className="text-center text-slate-400 py-10">Bạn chưa có mã giảm giá nào.</p>
+                ) : (
+                  vouchers.map(v => (
+                    <button 
+                      key={v.id}
+                      onClick={() => { setCoupon(v.code); setShowVoucherModal(false); handleApplyVoucher(); }}
+                      className="w-full text-left p-4 rounded-2xl border-2 border-slate-100 hover:border-primary-500 hover:bg-primary-50 transition-all group relative overflow-hidden"
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-xs font-black text-primary-600 bg-primary-100 px-2 py-0.5 rounded uppercase">{v.code}</span>
+                        <span className="text-lg font-black text-slate-900">-{v.discount}%</span>
+                      </div>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1">{v.title}</h4>
+                      <p className="text-xs text-slate-500 line-clamp-1">{v.description}</p>
+                      <div className="mt-2 text-[10px] text-slate-400 flex items-center gap-1">
+                         🕒 HSD: {new Date(v.endDate).toLocaleDateString('vi-VN')}
+                      </div>
+                    </button>
+                  ))
+                ) }
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

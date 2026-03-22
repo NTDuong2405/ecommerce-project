@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "tracking": "Tracking",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero": {
+      "badge": "New Collection 2026 is out now",
+      "title": "Discover Quality Products Without ",
+      "title_span": "Compromise",
+      "desc": "Elevate your daily life with our curated collection of premium essentials. Free global shipping on orders over $150.",
+      "cta_shop": "Shop Collection",
+      "cta_explore": "Explore Categories"
+    },
+    "features": {
+      "delivery": "Free Delivery",
+      "delivery_desc": "On all orders above $150",
+      "warranty": "1-Year Warranty",
+      "warranty_desc": "Guaranteed replacement",
+      "quality": "Premium Quality",
+      "quality_desc": "Sourced globally"
+    },
+    "trending": {
+      "title": "Trending Now",
+      "desc": "Our currently most popular items that everyone loves.",
+      "view_all": "View All"
+    }
+  },
+  "product": {
+    "in_stock": "In Stock",
+    "out_of_stock": "Out of Stock",
+    "only_left": "Only {{count}} left!",
+    "add_to_cart": "Add to Cart",
+    "view_details": "View Details",
+    "quick_add": "Quick Add",
+    "discount": "-{{count}}% OFF",
+    "sold_out": "Sold Out"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "free": "Free",
+    "reviews": "reviews"
+  },
+  "footer": {
+    "desc": "Your premium destination for exclusive items. We provide the best quality products for your lifestyle.",
+    "sections": {
+      "shop": "Shop",
+      "company": "Company",
+      "newsletter": "Newsletter"
+    },
+    "links": {
+      "all_products": "All Products",
+      "new_arrivals": "New Arrivals",
+      "discounted": "Discounted Items",
+      "about_us": "About Us",
+      "support": "Customer Support",
+      "terms": "Terms & Conditions"
+    },
+    "newsletter_desc": "Subscribe to receive updates, access to exclusive deals, and more.",
+    "subscribe": "Subscribe",
+    "email_placeholder": "Enter your email",
+    "rights": "© 2026 VibeCart. All rights reserved."
+  },
+  "currency": {
+    "symbol": "$",
+    "code": "USD",
+    "rate": 1
+  }
+}

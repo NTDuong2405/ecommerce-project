@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import api from '../../utils/api';
+
 const OrderTracking = () => {
   const [searchParams] = useSearchParams();
   const [orderId, setOrderId] = useState(searchParams.get('orderId') || '');
@@ -34,7 +36,7 @@ const OrderTracking = () => {
         setLoading(true);
         setError('');
         try {
-          const res = await axios.get(`http://localhost:3000/api/orders/track?orderId=${orderId}&contact=${contact}`);
+          const res = await api.get(`/orders/track?orderId=${orderId}&contact=${contact}`);
           setOrder(res.data.data);
         } catch (err) {
           setError(err.response?.data?.message || 'Không tìm thấy đơn hàng tự động.');
@@ -44,7 +46,7 @@ const OrderTracking = () => {
       };
       triggerTrack();
     }
-  }, []); // Chỉ chạy 1 lần khi mount
+  }, []);
 
   const handleTrack = async (e) => {
     e.preventDefault();
@@ -52,7 +54,7 @@ const OrderTracking = () => {
     setError('');
     setOrder(null);
     try {
-      const res = await axios.get(`http://localhost:3000/api/orders/track?orderId=${orderId}&contact=${contact}`);
+      const res = await api.get(`/orders/track?orderId=${orderId}&contact=${contact}`);
       setOrder(res.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Không tìm thấy đơn hàng. Vui lòng kiểm tra lại thông tin.');
@@ -161,33 +163,36 @@ const OrderTracking = () => {
                 </div>
 
                 {/* Visual Tracker */}
-                <div className="p-10 pt-16 pb-20">
-                  <div className="relative flex justify-between items-center px-4">
-                    {/* Road Background */}
-                    <div className="absolute left-0 right-0 top-6 h-1 bg-slate-100 rounded-full -z-0" />
-                    {/* Moving Progress */}
-                    <div
-                      className={`absolute left-0 top-6 h-1.5 bg-indigo-600 rounded-full transition-all duration-[2000ms] shadow-[0_0_15px_rgba(79,70,229,0.5)]`}
-                      style={{ width: `${(Math.max(0, currentStatus.step) / 3) * 100}%` }}
-                    />
-
+                <div className="p-6 md:p-10 pb-16 md:pb-20">
+                  <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center px-4 gap-8 md:gap-2">
+                    {/* Road Background (Horizontal on MD+) */}
+                    <div className="absolute left-8 lg:left-0 right-0 top-6 h-1 bg-slate-100 rounded-full -z-0 hidden md:block" />
+                    {/* Vertical Background (Mobile) */}
+                    <div className="absolute left-[38px] top-6 bottom-6 w-1 bg-slate-100 rounded-full -z-0 md:hidden" />
+                    
+                    {/* Road Background (Vertical on Mobile) */}
                     {['PENDING', 'CONFIRMED', 'SHIPPING', 'DELIVERED'].map((s, idx) => {
                       const Icon = statusMap[s].icon;
                       const done = currentStatus.step >= idx;
                       const active = currentStatus.step === idx;
                       return (
-                        <div key={s} className="relative z-10 flex flex-col items-center gap-6 group">
+                        <div key={s} className="relative z-10 flex flex-row md:flex-col items-center gap-6 group w-full md:w-auto">
                           <div className={`
-                            w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500
+                            w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shrink-0
                             ${done ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200' : 'bg-white text-slate-300 border-2 border-slate-100'}
-                            ${active ? 'ring-4 ring-indigo-50 scale-125' : ''}
+                            ${active ? 'ring-4 ring-indigo-50 scale-110 md:scale-125' : ''}
                           `}>
-                            <Icon className={`w-6 h-6 ${active ? 'animate-bounce' : ''}`} />
-                            {active && <div className="absolute -top-12 bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">Đang tiến hành</div>}
+                            <Icon className={`w-5 h-5 md:w-6 md:h-6 ${active ? 'animate-pulse' : ''}`} />
+                            {active && <div className="absolute -top-10 md:-top-12 bg-slate-900 text-white text-[9px] md:text-[10px] font-bold px-2 py-1 md:px-3 md:py-1.5 rounded-lg whitespace-nowrap shadow-lg">Hiện tại</div>}
                           </div>
-                          <span className={`text-[10px] font-black uppercase tracking-tighter ${done ? 'text-slate-900' : 'text-slate-300'}`}>
-                            {statusMap[s].label}
-                          </span>
+                          <div className="flex flex-col md:items-center">
+                            <span className={`text-[10px] md:text-[11px] font-black uppercase tracking-widest ${done ? 'text-slate-900' : 'text-slate-300'}`}>
+                              {statusMap[s].label}
+                            </span>
+                            <span className="text-[9px] text-slate-400 font-medium md:hidden">
+                              {idx === 0 ? 'Nhận đơn' : idx === 1 ? 'Lấy hàng' : idx === 2 ? 'Đang đi' : 'Tới nơi'}
+                            </span>
+                          </div>
                         </div>
                       );
                     })}

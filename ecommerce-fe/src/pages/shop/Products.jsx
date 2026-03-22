@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { Star, Search, SlidersHorizontal, ShoppingBag, ArrowLeft, ArrowRight } from 'lucide-react';
+import { formatPrice } from '../../utils/format';
+import { useTranslation } from 'react-i18next';
+
 
 const Products = () => {
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,6 +17,7 @@ const Products = () => {
   const [total, setTotal] = useState(0);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const sortParam = searchParams.get('sort');
   const limit = 8;
 
   const fetchProducts = async () => {
@@ -21,6 +27,12 @@ const Products = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
+      
+      // Hỗ trợ New Arrivals: Sắp xếp theo ngày tạo mới nhất
+      if (sortParam === 'newest') {
+        params.append('sortBy', 'createdAt');
+        params.append('order', 'desc');
+      }
 
       const res = await api.get(`/products?${params.toString()}`);
       setProducts(res.data.data.data || []);
@@ -34,7 +46,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [page, searchTerm, minPrice, maxPrice]);
+  }, [page, searchTerm, minPrice, maxPrice, sortParam]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -158,6 +170,7 @@ const Products = () => {
 
 /* ─── Product Card Component ─── */
 const ProductCard = ({ product }) => {
+  const { t } = useTranslation();
   const image = product.images?.[0]?.url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80';
 
   return (
@@ -198,9 +211,9 @@ const ProductCard = ({ product }) => {
         <h3 className="text-base font-bold text-slate-900 font-display mb-2 line-clamp-2">{product.name}</h3>
         <div className="mt-auto">
           <div className="flex items-center gap-2 mb-1">
-            <div className="text-xl font-bold text-slate-900">${product.price.toFixed(2)}</div>
+            <div className="text-xl font-bold text-slate-900">{formatPrice(product.price)}</div>
             {product.discountPercentage > 0 && (
-              <div className="text-sm text-slate-400 line-through">${product.originalPrice?.toFixed(2)}</div>
+              <div className="text-sm text-slate-400 line-through">{formatPrice(product.originalPrice)}</div>
             )}
           </div>
           {product.stock > 0 && product.stock <= 10 && (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { formatPrice } from '../../utils/format';
 
 /**
  * Trang kết quả thanh toán - VNPay và MoMo sẽ redirect về đây
@@ -56,7 +57,7 @@ const CheckoutResult = () => {
           {amount && (
             <div className="flex justify-between text-slate-600">
               <span>Amount</span>
-              <span className="font-bold text-slate-900">${Number(amount).toLocaleString()}</span>
+              <span className="font-bold text-slate-900">{formatPrice(Number(amount))}</span>
             </div>
           )}
           {method && (

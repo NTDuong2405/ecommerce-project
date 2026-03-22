@@ -63,24 +63,26 @@ const Profile = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 text-center border border-slate-100 overflow-hidden relative">
-            <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary-500 to-indigo-600 opacity-10"></div>
-            <div className="relative z-10">
-              <div className="w-20 h-20 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg shadow-primary-500/10 transition-transform hover:scale-105 duration-300">
-                <User size={40} />
+        {/* Sidebar / Tabs */}
+        <div className="lg:col-span-1 space-y-4 md:space-y-6">
+          <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-5 md:p-6 text-center border border-slate-100 overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-16 md:h-24 bg-gradient-to-r from-primary-500 to-indigo-600 opacity-10"></div>
+            <div className="relative z-10 flex flex-row lg:flex-col items-center gap-4 lg:gap-0">
+              <div className="w-14 h-14 md:w-20 md:h-20 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center border-4 border-white shadow-lg shadow-primary-500/10 transition-transform hover:scale-105 duration-300">
+                <User size={30} className="md:w-10 md:h-10" />
               </div>
-              <h3 className="font-display font-bold text-slate-900 truncate">{user?.email}</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">VibeCart Member</p>
+              <div className="text-left lg:text-center flex-1 min-w-0">
+                <h3 className="font-display font-bold text-slate-900 truncate text-base md:text-lg">{user?.email}</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">VibeCart Member</p>
+              </div>
             </div>
           </div>
 
           <nav className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-            <div className="p-2">
+            <div className="p-1 md:p-2 flex flex-row lg:flex-col overflow-x-auto scrollbar-hide">
               <NavItem 
                 icon={<Bell size={18} />} 
-                label="Hộp thư ưu đãi" 
+                label="Hộp thư" 
                 active={activeTab === 'notifications'} 
                 onClick={() => setActiveTab('notifications')}
                 badge={notifications.length}
@@ -97,14 +99,14 @@ const Profile = () => {
                 active={activeTab === 'wishlist'} 
                 onClick={() => setActiveTab('wishlist')}
               />
-              <div className="my-2 border-t border-slate-100 mx-2"></div>
+              <div className="hidden lg:block my-2 border-t border-slate-100 mx-2"></div>
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-2xl transition-colors"
+                className="flex items-center justify-between px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-2xl transition-colors whitespace-nowrap lg:w-full"
               >
                 <div className="flex items-center gap-3">
                   <LogOut size={18} />
-                  <span>Đăng xuất</span>
+                  <span className="hidden lg:inline">Đăng xuất</span>
                 </div>
               </button>
             </div>
@@ -113,7 +115,7 @@ const Profile = () => {
 
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 min-h-[500px] animate-fade-in-up">
+          <div className="bg-white rounded-3xl md:rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-5 md:p-8 min-h-[400px] md:min-h-[500px] animate-fade-in-up">
             {activeTab === 'notifications' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center mb-6">
@@ -236,18 +238,18 @@ const Profile = () => {
 const NavItem = ({ icon, label, active, onClick, badge }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center justify-between px-4 py-3.5 text-sm font-semibold rounded-2xl transition-all ${
+    className={`flex items-center justify-center lg:justify-between px-4 lg:px-4 py-2.5 lg:py-3.5 text-xs lg:text-sm font-semibold rounded-2xl transition-all whitespace-nowrap gap-2 lg:gap-3 ${
       active 
         ? 'bg-primary-50 text-primary-600 shadow-sm' 
         : 'text-slate-500 hover:bg-slate-50'
     }`}
   >
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 lg:gap-3">
       <span className={active ? 'text-primary-600' : 'text-slate-400'}>{icon}</span>
       <span>{label}</span>
     </div>
     {badge > 0 && (
-      <span className="bg-primary-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{badge}</span>
+      <span className="bg-primary-600 text-white text-[9px] lg:text-[10px] font-bold px-1.5 py-0.5 rounded-full">{badge}</span>
     )}
   </button>
 );

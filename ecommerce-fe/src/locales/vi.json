@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "home": "Trang Chủ",
+    "products": "Sản Phẩm",
+    "cart": "Giỏ Hàng",
+    "tracking": "Tra Cứu",
+    "login": "Đăng Nhập",
+    "register": "Đăng Ký",
+    "logout": "Đăng Xuất",
+    "admin": "Quản Trị"
+  },
+  "home": {
+    "hero": {
+      "badge": "Bộ sưu tập Mới 2026 đã sẵn sàng",
+      "title": "Chất Lượng Thật - Không Cần ",
+      "title_span": "Đánh Đổi",
+      "desc": "Nâng tầm phong cách sống với bộ sưu tập CAO CẤP được tuyển chọn kỹ lưỡng. Miễn phí vận chuyển toàn cầu cho đơn hàng trên 3.750.000đ.",
+      "cta_shop": "Mua Ngay",
+      "cta_explore": "Khám Phá"
+    },
+    "features": {
+      "delivery": "Giao Hàng Miễn Phí",
+      "delivery_desc": "Cho đơn hàng trên 3.750.000đ",
+      "warranty": "Bảo Hành 1 Năm",
+      "warranty_desc": "Cam kết đổi trả 1-1",
+      "quality": "Chất Lượng Cao",
+      "quality_desc": "Nguồn gốc toàn cầu"
+    },
+    "trending": {
+      "title": "Xu Hướng",
+      "desc": "Những sản phẩm thịnh hành nhất được mọi người săn đón.",
+      "view_all": "Xem Tất Cả"
+    }
+  },
+  "product": {
+    "in_stock": "Còn Hàng",
+    "out_of_stock": "Hết Hàng",
+    "only_left": "Chỉ còn {{count}} sản phẩm!",
+    "add_to_cart": "Thêm vào giỏ",
+    "view_details": "Xem chi tiết",
+    "quick_add": "Mua nhanh",
+    "discount": "-{{count}}% ƯU ĐÃI",
+    "sold_out": "Đã Hết Hàng"
+  },
+  "cart": {
+    "title": "Giỏ Hàng Của Bạn",
+    "empty": "Giỏ hàng đang trống",
+    "subtotal": "Tạm tính",
+    "shipping": "Phí vận chuyển",
+    "total": "Tổng cộng",
+    "checkout": "Tiến hành Thanh toán",
+    "free": "Miễn phí",
+    "reviews": "đánh giá"
+  },
+  "footer": {
+    "desc": "Điểm đến cao cấp cho những sản phẩm độc quyền. Chúng tôi cung cấp những sản phẩm tốt nhất cho phong cách sống của bạn.",
+    "sections": {
+      "shop": "Mua Sắm",
+      "company": "Công Ty",
+      "newsletter": "Bản Tin"
+    },
+    "links": {
+      "all_products": "Tất Cả Sản Phẩm",
+      "new_arrivals": "Hàng Mới Về",
+      "discounted": "Hàng Giảm Giá",
+      "about_us": "Về Chúng Tôi",
+      "support": "Hỗ Trợ Khách Hàng",
+      "terms": "Điều Khoản & Dịch Vụ"
+    },
+    "newsletter_desc": "Đăng ký để nhận cập nhật, ưu đãi độc quyền và nhiều hơn thế nữa.",
+    "subscribe": "Đăng Ký",
+    "email_placeholder": "Nhập email của bạn",
+    "rights": "© 2026 VibeCart. Bảo lưu mọi quyền."
+  },
+  "currency": {
+    "symbol": "đ",
+    "code": "VND",
+    "rate": 25000
+  }
+}

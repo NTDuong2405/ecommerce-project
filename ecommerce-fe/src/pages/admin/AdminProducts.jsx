@@ -208,55 +208,57 @@ const AdminProducts = () => {
         </button>
       </div>
 
-      {/* Products Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Products Table / Cards View */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+        {/* Desktop View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 text-slate-600 text-sm border-b border-slate-200">
-                <th className="px-6 py-4 font-semibold w-12">ID</th>
-                <th className="px-6 py-4 font-semibold">Product Info</th>
-                <th className="px-6 py-4 font-semibold">Price</th>
-                <th className="px-6 py-4 font-semibold text-center">Stock</th>
-                <th className="px-6 py-4 font-semibold text-right">Actions</th>
+              <tr className="bg-slate-50/50 text-slate-500 text-xs font-black uppercase tracking-widest border-b border-slate-200">
+                <th className="px-6 py-4 w-12 text-center">ID</th>
+                <th className="px-6 py-4">Product Info</th>
+                <th className="px-6 py-4">Price</th>
+                <th className="px-6 py-4 text-center">Stock</th>
+                <th className="px-6 py-4 text-right pr-10">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
-                 <tr><td colSpan="4" className="text-center py-6 text-slate-500">Loading products...</td></tr>
+                 <tr><td colSpan="5" className="text-center py-20 text-slate-400 font-medium">Loading catalog...</td></tr>
               ) : products.length === 0 ? (
-                 <tr><td colSpan="4" className="text-center py-6 text-slate-500">No products found.</td></tr>
+                 <tr><td colSpan="5" className="text-center py-20 text-slate-400 font-medium">No products match your search.</td></tr>
               ) : (
                  products.map((product) => (
-                  <tr key={product.id} className="hover:bg-slate-50 transition-colors group">
-                    <td className="px-6 py-4 text-slate-500 text-sm">#{product.id}</td>
+                  <tr key={product.id} className="hover:bg-slate-50/80 transition-all group">
+                    <td className="px-6 py-4 text-slate-400 text-xs font-mono text-center">#{product.id}</td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shadow-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shadow-sm shrink-0">
                           <img src={product.images?.[0]?.url || 'https://via.placeholder.com/150'} alt={product.name} className="w-full h-full object-cover" />
                         </div>
-                        <div>
-                          <div className="font-bold text-slate-900">{product.name}</div>
-                          <div className="text-sm text-slate-500 mt-0.5 line-clamp-1">{product.description || 'No description'}</div>
+                        <div className="min-w-0 max-w-[200px] lg:max-w-xs">
+                          <div className="font-black text-slate-900 truncate">{product.name}</div>
+                          <div className="text-xs text-slate-400 mt-1 line-clamp-1">{product.description || 'No description'}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-semibold text-slate-900">${product.price.toLocaleString()}</td>
                     <td className="px-6 py-4">
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono transition-all duration-500
-                        ${product.isUpdating ? 'ring-4 ring-emerald-400 scale-125 bg-emerald-100' : ''}
+                      <span className="font-black text-slate-900">{product.price.toLocaleString()}đ</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all duration-500
+                        ${product.isUpdating ? 'ring-4 ring-primary-400 scale-110 bg-primary-50' : ''}
                         ${product.stock > 10 ? 'bg-emerald-50 text-emerald-600' : product.stock > 0 ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600'}`}>
-                        <Package size={12} className={product.stock === 0 ? 'animate-bounce' : ''} />
                         {product.stock}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleOpenEdit(product)} className="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors">
-                          <Edit2 size={18} />
+                    <td className="px-6 py-4 text-right pr-6">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0">
+                        <button onClick={() => handleOpenEdit(product)} className="p-2.5 text-slate-400 hover:text-primary-600 hover:bg-white rounded-xl shadow-sm hover:shadow transition-all border border-transparent hover:border-slate-100">
+                          <Edit2 size={16} />
                         </button>
-                        <button onClick={() => setDeleteConfirmId(product.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">
-                          <Trash2 size={18} />
+                        <button onClick={() => setDeleteConfirmId(product.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl shadow-sm hover:shadow transition-all border border-transparent hover:border-slate-100">
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -266,8 +268,45 @@ const AdminProducts = () => {
             </tbody>
           </table>
         </div>
-        <Pagination meta={meta} onPageChange={(p) => setPage(p)} />
+
+        {/* Mobile View - Cards */}
+        <div className="md:hidden divide-y divide-slate-100 px-4 py-2">
+          {loading ? (
+             <div className="py-20 text-center text-slate-400 font-medium">Loading catalog...</div>
+          ) : products.length === 0 ? (
+             <div className="py-20 text-center text-slate-400 font-medium">No products found.</div>
+          ) : (
+            products.map((product) => (
+              <div key={product.id} className="py-5 flex items-start gap-4 animate-fade-in-up">
+                <div className="w-20 h-20 rounded-2xl bg-slate-100 overflow-hidden border border-slate-200 shadow-sm shrink-0">
+                  <img src={product.images?.[0]?.url || 'https://via.placeholder.com/150'} alt={product.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex justify-between items-start gap-2">
+                    <h4 className="font-black text-slate-900 text-sm leading-tight line-clamp-2">{product.name}</h4>
+                    <span className="text-[10px] font-mono text-slate-400 shrink-0">#{product.id}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="font-black text-primary-600 text-base">{product.price.toLocaleString()}đ</div>
+                    <div className={`px-2 py-0.5 rounded-lg text-[10px] font-black tracking-widest uppercase ${product.stock > 10 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                      Stock: {product.stock}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <button onClick={() => handleOpenEdit(product)} className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors">
+                      <Edit2 size={14} /> Sửa
+                    </button>
+                    <button onClick={() => setDeleteConfirmId(product.id)} className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors">
+                      <Trash2 size={14} /> Xóa
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
+      <Pagination meta={meta} onPageChange={(p) => setPage(p)} />
 
       {/* --- CẤU TRÚC MODAL CHI TIẾT SẢN PHẨM --- */}
       {isModalOpen && (

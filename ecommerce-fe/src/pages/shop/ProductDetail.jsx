@@ -5,8 +5,11 @@ import { Star, ShoppingBag, ChevronLeft, Check, Shield, Truck, RotateCcw, Heart 
 import { useCart } from '../../context/CartContext';
 import { useSocket } from '../../context/SocketContext';
 import { toast } from 'react-hot-toast';
+import { formatPrice } from '../../utils/format';
+import { useTranslation } from 'react-i18next';
 
 const ProductDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const { addToCart } = useCart();
   const { socket } = useSocket();
@@ -193,10 +196,10 @@ const ProductDetail = () => {
 
           {/* Price */}
           <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-extrabold text-slate-900 font-display">${product.price.toFixed(2)}</span>
+            <span className="text-4xl font-extrabold text-slate-900 font-display">{formatPrice(product.price)}</span>
             {product.discountPercentage > 0 && (
               <>
-                <span className="text-slate-400 line-through text-lg">${product.originalPrice?.toFixed(2)}</span>
+                <span className="text-slate-400 line-through text-lg">{formatPrice(product.originalPrice)}</span>
                 <span className="px-2 py-0.5 bg-red-100 text-red-600 text-sm font-bold rounded-full">-{product.discountPercentage}%</span>
               </>
             )}

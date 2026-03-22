@@ -4,18 +4,20 @@ import './index.css';
 import App from './App';
 import { CartProvider } from './context/CartContext';
 import { SocketProvider } from './context/SocketContext';
+import i18n from './i18n';
+import { I18nextProvider } from 'react-i18next';
 
 import { Toaster } from 'react-hot-toast';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  <I18nextProvider i18n={i18n}>
     <SocketProvider>
       <CartProvider>
         <Toaster position="top-center" reverseOrder={false} />
         <App />
       </CartProvider>
     </SocketProvider>
-  </React.StrictMode>
+  </I18nextProvider>
 );
 

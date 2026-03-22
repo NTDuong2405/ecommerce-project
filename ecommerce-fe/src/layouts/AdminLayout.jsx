@@ -1,11 +1,13 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Warehouse, Bell, X, CheckCircle, Megaphone, Activity } from 'lucide-react';
+import { Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Warehouse, Bell, X, CheckCircle, Megaphone, Activity, Menu } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSocket } from '../context/SocketContext';
 import NotificationBell from '../components/NotificationBell';
 
 const AdminLayout = () => {
   const [user, setUser] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const userStr = localStorage.getItem('admin_user');
@@ -13,6 +15,11 @@ const AdminLayout = () => {
       setUser(JSON.parse(userStr));
     }
   }, []);
+
+  // Đóng sidebar khi chuyển trang trên mobile
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
@@ -23,15 +30,30 @@ const AdminLayout = () => {
   const isStaff = user?.role === 'STAFF';
 
   return (
-    <div className="min-h-screen flex bg-slate-100 relative">
+    <div className="h-screen flex bg-slate-100 overflow-hidden">
+
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white min-h-screen flex flex-col transition-all duration-300 shadow-xl">
-        <div className="p-6 border-b border-slate-800/50">
+      <aside className={`
+        fixed lg:sticky lg:top-0 inset-y-0 left-0 w-64 bg-slate-900 text-white z-50 transform transition-transform duration-300 shadow-2xl lg:translate-x-0 h-screen
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        flex flex-col
+      `}>
+        <div className="p-6 border-b border-slate-800/50 flex items-center justify-between">
           <h2 className="text-2xl font-display font-bold text-primary-400">AdminPanel.</h2>
+          <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white">
+            <X size={20} />
+          </button>
         </div>
         
-        <nav className="flex-1 px-4 space-y-2 mt-6">
+        <nav className="flex-1 px-4 space-y-2 mt-6 overflow-y-auto custom-scrollbar">
           <SidebarItem icon={<BarChart3 />} label="Dashboard" to="/admin" />
           
           {/* Chỉ Admin mới thấy Analytics & Settings */}
@@ -61,13 +83,22 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-800 tracking-tight">Management Dashboard</h1>
-            {isStaff && <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Staff</span>}
-            {!isStaff && user && <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Admin</span>}
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+            >
+              <Menu size={24} />
+            </button>
+            <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+              <h1 className="text-sm md:text-xl font-bold text-slate-800 tracking-tight truncate max-w-[120px] md:max-w-none">
+                {location.pathname === '/admin' ? 'Dashboard' : location.pathname.split('/').pop().charAt(0).toUpperCase() + location.pathname.split('/').pop().slice(1)}
+              </h1>
+              {isStaff && <span className="text-[8px] md:text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest w-fit">Staff</span>}
+            </div>
           </div>
           <div className="flex items-center gap-6">
             <NotificationBell />

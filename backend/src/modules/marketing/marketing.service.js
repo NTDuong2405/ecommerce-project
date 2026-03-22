@@ -102,15 +102,19 @@ export const sendBirthdayWish = async (userId) => {
   });
 
   if (!existing) {
+    // Tính ngày cuối cùng của tháng hiện tại để code chỉ có hiệu lực đúng tháng đó
+    const now = new Date();
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
     await prisma.promotion.create({
       data: {
         userId: user.id,
         code: bdayCode,
         title: `Mừng sinh nhật ${user.email}!`,
-        description: `Quà tặng sinh nhật đặc biệt từ VibeCart: Giảm giá 20% cho đơn hàng của bạn.`,
+        description: `Quà tặng sinh nhật đặc biệt từ VibeCart tại tháng ${now.getMonth() + 1}: Giảm giá 20% cho đơn hàng của bạn.`,
         discount: 20,
         startDate: new Date(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Có hiệu lực trong 30 ngày
+        endDate: lastDayOfMonth, // Chỉ có hiệu lực đến hết ngày cuối cùng của tháng sinh nhật
         isActive: true
       }
     });

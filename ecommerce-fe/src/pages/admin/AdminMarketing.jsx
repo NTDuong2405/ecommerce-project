@@ -110,6 +110,11 @@ const AdminMarketing = () => {
                       <div className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 inline-block mt-1">CODE: {promo.code}</div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {new Date(promo.endDate) < new Date() ? (
+                        <span className="text-[10px] bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase">Hết hạn</span>
+                      ) : (
+                        <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">Đang chạy</span>
+                      )}
                       <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-bold">-{promo.discount}%</span>
                       <button 
                         onClick={() => handleDeletePromo(promo.id)}

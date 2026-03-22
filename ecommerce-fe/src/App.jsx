@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { fetchExchangeRate } from './utils/exchangeRate';
 import ShopLayout from './layouts/ShopLayout';
 import AdminLayout from './layouts/AdminLayout';
 import Home from './pages/shop/Home';
@@ -23,6 +25,18 @@ import AdminLogin from './pages/admin/AdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
+  useEffect(() => {
+    const initRate = async () => {
+      const newRate = await fetchExchangeRate();
+      if (newRate) {
+        // Cập nhật tỷ giá vào i18n để các component dùng useTranslation tự động re-render
+        const i18n = (await import('./i18n')).default;
+        i18n.addResource('vi', 'translation', 'currency.rate', newRate);
+      }
+    };
+    initRate();
+  }, []);
+
   return (
     <Router>
       <Routes>
