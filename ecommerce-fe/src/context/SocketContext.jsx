@@ -10,11 +10,14 @@ export const SocketProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    console.log('🔄 [Socket.io] Socket.io Attempting connection to Port 3000...');
+    // Tự động nhận diện URL Backend (Xóa /api ở cuối nếu có)
+    const socketUrl = import.meta.env.VITE_API_URL 
+      ? import.meta.env.VITE_API_URL.replace('/api', '') 
+      : 'http://localhost:3000';
+
+    console.log(`🔄 [Socket.io] Attempting connection to ${socketUrl}...`);
     
-    // Kết nối về Backend (cổng 3000)
-    // Dùng mảng các transports và cấu hình reconnection mạnh mẽ hơn
-    const newSocket = io('http://localhost:3000', {
+    const newSocket = io(socketUrl, {
       withCredentials: true,
       transports: ['websocket', 'polling'], // Ưu tiên websocket
       reconnection: true,
