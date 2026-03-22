@@ -69,7 +69,17 @@ const ChatBox = () => {
 
   const fetchHistory = async (id) => {
     try {
-      const res = await api.get(`/customers/${id}/chat`);
+      let endpoint = `/customers/${id}/chat`;
+      const storedUser = localStorage.getItem('user');
+      const isMember = storedUser && storedUser !== 'undefined' && storedUser !== 'null';
+      
+      if (isMember) {
+        endpoint = `/customers/chat`;
+      } else {
+        endpoint = `/customers/${id}/chat_from_guest`;
+      }
+
+      const res = await api.get(endpoint);
       setMessages(res.data?.data || []);
     } catch (err) {
       console.error("Lỗi fetch chat history:", err);

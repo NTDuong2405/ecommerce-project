@@ -41,15 +41,43 @@ export const sendChatFromGuest = async (req, res) => {
   } catch (err) { res.status(400).json({ message: err.message }); }
 }
 
+import { prisma } from '../../config/prisma.js';
+
+export const getMyChats = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?.userId;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    
+    // Tìm ID của ADMIN để lấy hội thoại chung
+    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    const adminId = admin ? admin.id : 1; 
+
+    const data = await customerService.getChats(adminId, userId);
+    res.json({ message: 'Get my chats success', data });
+  } catch (err) { res.status(400).json({ message: err.message }); }
+}
+
+export const getChatsByGuestId = async (req, res) => {
+  try {
+    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    const adminId = admin ? admin.id : 1; 
+    const data = await customerService.getChats(adminId, req.params.id);
+    res.json({ message: 'Get guest chats success', data });
+  } catch (err) { res.status(400).json({ message: err.message }); }
+}
+
 export const sendChatFromMember = async (req, res) => {
   try {
-    // Thử cả id và userId cho chắc
     const userId = req.user?.id || req.user?.userId;
-    console.log("🕵️‍♂️ [Controller] Member sending. User from Token:", req.user, "Target ID:", userId);
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    // Tin nhắn từ khách luôn gửi tới Admin
+    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    const adminId = admin ? admin.id : 1;
 
     const data = await customerService.sendChat({
       senderId: userId, 
-      receiverId: 1, 
+      receiverId: adminId, 
       content: req.body.content, 
       guestId: null
     });
@@ -66,7 +94,8 @@ export const sendNotification = async (req, res) => {
 
 export const getChats = async (req, res) => {
   try {
-    const data = await customerService.getChats(1, req.params.id);
+    const adminId = req.user?.id || req.user?.userId;
+    const data = await customerService.getChats(adminId, req.params.id);
     res.json({ message: 'Get chats success', data });
   } catch (err) { res.status(400).json({ message: err.message }); }
 }

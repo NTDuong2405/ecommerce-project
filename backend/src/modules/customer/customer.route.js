@@ -13,6 +13,10 @@ router.patch('/notifications/:notifId/read', authMiddleware, customerController.
 router.get('/admin/notifications', authMiddleware, staffMiddleware, customerController.getAdminNotifications);
 router.patch('/admin/notifications/:notifId/read', authMiddleware, staffMiddleware, customerController.markAdminNotificationRead);
 
+// [MEMBER/GUEST] Lấy lịch sử chat
+router.get('/chat', authMiddleware, customerController.getMyChats);
+router.get('/:id/chat_from_guest', customerController.getChatsByGuestId);
+
 // [STAFF/ADMIN] Chat & Gửi thông báo
 router.post('/chat_from_member', authMiddleware, customerController.sendChatFromMember);
 router.post('/:id/chat', authMiddleware, staffMiddleware, customerController.sendChat);
