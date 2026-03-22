@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { ArrowRight, Star, TrendingUp, ShieldCheck, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSocket } from '../../context/SocketContext';
@@ -10,7 +10,7 @@ const Home = () => {
 
   useEffect(() => {
     // 1. Fetch dữ liệu ban đầu
-    axios.get('http://localhost:3000/api/products?limit=4')
+    api.get('/products?limit=4')
       .then(res => {
         setProducts(res.data.data.data || res.data.data || []);
       })

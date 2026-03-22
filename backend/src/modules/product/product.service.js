@@ -152,3 +152,71 @@ export const remove = async (id) => {
     where: { id: Number(id) }
   })
 }
+
+// ✅ [SERVICE] [IMPORT EXCEL] Xử lý hàng loạt sản phẩm
+export const importProducts = async (data) => {
+  let count = 0;
+  for (const row of data) {
+    const productId = Number(row.id || row.ID);
+    const stock = Number(row.stock || row.Stock);
+    const price = Number(row.price || row.Price);
+    const name = row.name || row.Name;
+    const category = row.category || row.Category;
+    const description = row.description || row.Description;
+
+    if (productId && !isNaN(productId)) {
+      // 1. Cập nhật sản phẩm hiện có
+      await prisma.product.update({
+        where: { id: productId },
+        data: {
+          ...(row.stock !== undefined && { stock: stock }), // Cập nhật số lượng mới
+          ...(price && { price: price }),
+          ...(name && { name: name }),
+          ...(category && { category: category }),
+          ...(description !== undefined && { description: description })
+        }
+      });
+      count++;
+    } else if (name) {
+      // 2. Tạo sản phẩm mới hoàn toàn
+      await prisma.product.create({
+        data: {
+          name: name,
+          category: category || 'General',
+          price: price || 0,
+          stock: stock || 0,
+          description: description || ''
+        }
+      });
+      count++;
+    }
+  }
+  return { count };
+}
+
+// ✅ [SERVICE] [EXPORT TEMPLATE] Lấy dữ liệu sản phẩm để làm mẫu Excel
+export const getExportTemplateData = async () => {
+  const products = await prisma.product.findMany({
+    select: {
+      id: true,
+      name: true,
+      category: true,
+      price: true,
+      stock: true
+    },
+    orderBy: { id: 'asc' }
+  });
+  
+  if (products.length === 0) {
+    // Nếu chưa có SP nào, trả về 1 dòng ví dụ
+    return [{
+      id: '',
+      name: 'Nike Air Force 1 (Ví dụ)',
+      category: 'Shoes',
+      price: 1500000,
+      stock: 50
+    }];
+  }
+  
+  return products;
+}

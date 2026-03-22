@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/api';
 import { Star, ShoppingBag, ChevronLeft, Check, Shield, Truck, RotateCcw, Heart } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useSocket } from '../../context/SocketContext';
+import { toast } from 'react-hot-toast';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -19,7 +20,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:3000/api/products/${id}`);
+        const res = await api.get(`/products/${id}`);
         setProduct(res.data.data);
       } catch (err) {
         console.error(err);
@@ -48,6 +49,7 @@ const ProductDetail = () => {
     if (!product) return;
     addToCart(product, quantity);
     setAdded(true);
+    toast.success(`Đã thêm ${product.name} vào giỏ hàng! 🛒`);
     setTimeout(() => setAdded(false), 2000);
   };
 

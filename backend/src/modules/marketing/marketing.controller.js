@@ -46,3 +46,38 @@ export const deletePromotion = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const validateCoupon = async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ message: "Vui lòng nhập mã giảm giá" });
+    const data = await marketingService.validateCoupon(code.toUpperCase());
+    res.json({ message: 'Mã giảm giá hợp lệ', data });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+import { verifyToken } from '../../utils/jwt.js';
+
+export const getAvailablePromotions = async (req, res) => {
+  try {
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = verifyToken(token);
+        userId = decoded.id || decoded.userId;
+      } catch (err) {
+        // Token hết hạn hoặc sai thì thôi, coi như guest
+      }
+    }
+
+    const data = await marketingService.getAvailablePromotions(userId);
+    res.json({ message: 'Get active promotions success', data });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

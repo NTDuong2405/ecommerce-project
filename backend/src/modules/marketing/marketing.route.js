@@ -4,13 +4,17 @@ import { authMiddleware, staffMiddleware } from '../../middlewares/auth.middlewa
 
 const router = express.Router();
 
-// Chỉ Admin/Staff mới được vào
-router.use(authMiddleware, staffMiddleware);
+// Public route for checkout validation
+router.post('/validate', marketingController.validateCoupon);
 
-router.get('/promotions', marketingController.getPromotions);
-router.post('/promotions', marketingController.createPromotion);
-router.delete('/promotions/:id', marketingController.deletePromotion);
-router.get('/birthdays', marketingController.getBirthdays);
-router.post('/birthdays/:userId', marketingController.sendBirthdayWish);
+// Get available promotions (Public or Auth)
+router.get('/available', marketingController.getAvailablePromotions);
+
+// Admin/Staff routes
+router.get('/promotions', authMiddleware, staffMiddleware, marketingController.getPromotions);
+router.post('/promotions', authMiddleware, staffMiddleware, marketingController.createPromotion);
+router.delete('/promotions/:id', authMiddleware, staffMiddleware, marketingController.deletePromotion);
+router.get('/birthdays', authMiddleware, staffMiddleware, marketingController.getBirthdays);
+router.post('/birthdays/:userId', authMiddleware, staffMiddleware, marketingController.sendBirthdayWish);
 
 export default router;

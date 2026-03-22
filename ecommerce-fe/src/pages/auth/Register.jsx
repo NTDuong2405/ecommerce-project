@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/api';
 import { Mail, Lock, ArrowRight, UserPlus, AlertCircle, CheckCircle, Phone, Cake } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -27,17 +28,19 @@ const Register = () => {
     }
 
     try {
-      await axios.post('http://localhost:3000/api/users/register', { 
+      await api.post('/users/register', { 
         email: formData.email, 
         password: formData.password,
         phone: formData.phone,
         birthday: formData.birthday
       });
       
+      toast.success('Đăng ký thành công! Hãy đăng nhập để tiếp tục. 🎉');
       // Navigate to login after success
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+      toast.error('Đăng ký thất bại!');
     } finally {
       setLoading(false);
     }

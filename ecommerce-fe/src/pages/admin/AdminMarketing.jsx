@@ -7,7 +7,7 @@ const AdminMarketing = () => {
   const [birthdays, setBirthdays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newPromo, setNewPromo] = useState({ title: '', description: '', discount: 10, startDate: '', endDate: '' });
+  const [newPromo, setNewPromo] = useState({ code: '', title: '', description: '', discount: 10, startDate: '', endDate: '' });
   const [status, setStatus] = useState({ type: '', msg: '' });
 
   useEffect(() => {
@@ -35,10 +35,11 @@ const AdminMarketing = () => {
       await api.post('/marketing/promotions', newPromo);
       setStatus({ type: 'success', msg: 'Khởi tạo chiến dịch & thông báo toàn hệ thống thành công!' });
       setShowAddModal(false);
-      setNewPromo({ title: '', description: '', discount: 10, startDate: '', endDate: '' }); // Xóa trắng form
+      setNewPromo({ code: '', title: '', description: '', discount: 10, startDate: '', endDate: '' }); // Xóa trắng form
       fetchData();
     } catch (err) {
-      setStatus({ type: 'error', msg: 'Lỗi khi tạo khuyến mãi' });
+      const errorMsg = err.response?.data?.message || 'Lỗi khi tạo khuyến mãi';
+      setStatus({ type: 'error', msg: errorMsg });
     }
   };
 
@@ -104,7 +105,10 @@ const AdminMarketing = () => {
               promotions.map(promo => (
                 <div key={promo.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:border-primary-200 transition-colors group relative">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold text-slate-900">{promo.title}</h4>
+                    <div>
+                      <h4 className="font-bold text-slate-900">{promo.title}</h4>
+                      <div className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 inline-block mt-1">CODE: {promo.code}</div>
+                    </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-bold">-{promo.discount}%</span>
                       <button 
@@ -181,6 +185,28 @@ const AdminMarketing = () => {
               </h3>
             </div>
             <form onSubmit={handleCreatePromo} className="p-8 space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Mã Voucher (In hoa)</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="VIBE50"
+                    className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none font-mono"
+                    value={newPromo.code}
+                    onChange={e => setNewPromo({...newPromo, code: e.target.value.toUpperCase()})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Mức giảm (%)</label>
+                  <input 
+                    type="number" 
+                    className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                    value={newPromo.discount}
+                    onChange={e => setNewPromo({...newPromo, discount: e.target.value})}
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Tiêu đề Chiến dịch</label>
                 <input 
@@ -197,21 +223,14 @@ const AdminMarketing = () => {
                 <textarea 
                   required
                   rows="3"
+                  placeholder="Ví dụ: Tặng bạn ưu đãi 10% cho tất cả sản phẩm..."
                   className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
                   value={newPromo.description}
                   onChange={e => setNewPromo({...newPromo, description: e.target.value})}
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Mức giảm (%)</label>
-                  <input 
-                    type="number" 
-                    className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
-                    value={newPromo.discount}
-                    onChange={e => setNewPromo({...newPromo, discount: e.target.value})}
-                  />
-                </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700">Ngày bắt đầu</label>
                   <input 
@@ -222,16 +241,16 @@ const AdminMarketing = () => {
                     onChange={e => setNewPromo({...newPromo, startDate: e.target.value})}
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700">Này kết thúc</label>
-                <input 
-                  type="date" 
-                  required
-                  className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
-                  value={newPromo.endDate}
-                  onChange={e => setNewPromo({...newPromo, endDate: e.target.value})}
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Ngày kết thúc</label>
+                  <input 
+                    type="date" 
+                    required
+                    className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                    value={newPromo.endDate}
+                    onChange={e => setNewPromo({...newPromo, endDate: e.target.value})}
+                  />
+                </div>
               </div>
 
               <div className="flex gap-4 pt-4">

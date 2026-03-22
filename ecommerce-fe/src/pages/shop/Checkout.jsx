@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { CheckCircle, ShoppingBag, Truck, CreditCard, ChevronRight, Copy, ExternalLink } from 'lucide-react';
+import api from '../../utils/api';
+import { CheckCircle, ShoppingBag, Truck, CreditCard, ChevronRight, Copy, ExternalLink, Ticket, X } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
 const STEPS = ['Cart Review', 'Delivery Info', 'Payment'];
@@ -17,10 +17,43 @@ const Checkout = () => {
     fullName: '', email: '', phone: '', address: '', city: '', note: '',
     paymentMethod: 'COD'
   });
+  const [coupon, setCoupon] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [vouchers, setVouchers] = useState([]);
+  const [showVoucherModal, setShowVoucherModal] = useState(false);
+
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      try {
+        const res = await api.get('/marketing/available');
+        setVouchers(res.data.data);
+      } catch (err) {
+        console.log('User not logged in or no vouchers');
+      }
+    };
+    fetchVouchers();
+  }, []);
 
   const shippingFee = totalPrice >= 150 ? 0 : 9.99;
-  const grandTotal = totalPrice + shippingFee;
+  const discountAmount = appliedPromo ? (totalPrice * (appliedPromo.discount / 100)) : 0;
+  const grandTotal = Math.max(0, totalPrice + shippingFee - discountAmount);
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleApplyVoucher = async () => {
+    if (!coupon) return;
+    setIsValidating(true);
+    try {
+      const res = await api.post('/marketing/validate', { code: coupon.toUpperCase() });
+      setAppliedPromo(res.data.data);
+      // toast.success(`Đã áp dụng mã ${coupon.toUpperCase()}!`); (Giả sử có toast)
+    } catch (err) {
+      setAppliedPromo(null);
+      alert(err.response?.data?.message || 'Mã giảm giá không hợp lệ');
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const handlePlaceOrder = async () => {
     setProcessing(true);
@@ -35,15 +68,16 @@ const Checkout = () => {
         address: form.address,
         city: form.city,
         note: form.note,
-        shippingMethod: totalPrice >= 150 ? 'Free Shipping' : 'Standard Delivery',
-        shippingPrice: shippingFee
+        shippingPrice: shippingFee,
+        discountAmount: discountAmount,
+        couponCode: appliedPromo?.code || null
       };
 
-      const orderRes = await axios.post('http://localhost:3000/api/orders', orderData);
+      const orderRes = await api.post('/orders', orderData);
       const realOrderId = orderRes.data.data.id;
 
       // 2. Khởi tạo thanh toán (Payment) với OrderId thật
-      const paymentRes = await axios.post('http://localhost:3000/api/payments/initiate', {
+      const paymentRes = await api.post('/payments/initiate', {
         orderId: realOrderId,
         method: form.paymentMethod,
         amount: grandTotal,
@@ -342,10 +376,65 @@ const Checkout = () => {
                 <span>Shipping</span>
                 <span className={shippingFee === 0 ? 'text-emerald-600 font-medium' : ''}>{shippingFee === 0 ? 'Free' : `$${shippingFee.toFixed(2)}`}</span>
               </div>
+              {appliedPromo && (
+                <div className="flex justify-between text-rose-500 font-medium">
+                  <span>Discount ({appliedPromo.discount}%)</span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="border-t border-slate-100 pt-2 flex justify-between font-bold text-base text-slate-900">
                 <span>Total</span><span>${grandTotal.toFixed(2)}</span>
               </div>
             </div>
+
+            {/* Voucher Input Section */}
+            {!appliedPromo ? (
+              <div className="mt-6 border-t border-slate-100 pt-4">
+                <div className="flex justify-between items-end mb-2 px-1">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ">Have a Coupon?</label>
+                  {vouchers.length > 0 && (
+                    <button 
+                      onClick={() => setShowVoucherModal(true)}
+                      className="text-[10px] font-bold text-primary-600 hover:underline uppercase tracking-widest"
+                    >
+                      Chọn từ ưu đãi ({vouchers.length})
+                    </button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="Enter code..." 
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono"
+                    value={coupon}
+                    onChange={e => setCoupon(e.target.value)}
+                  />
+                  <button 
+                    onClick={handleApplyVoucher}
+                    disabled={!coupon || isValidating}
+                    className="bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 disabled:opacity-40 transition-all font-display"
+                  >
+                    {isValidating ? '...' : 'Apply'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between animate-fade-in">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">🏷️</div>
+                  <div>
+                    <div className="text-xs font-bold text-emerald-700">{appliedPromo.code}</div>
+                    <div className="text-[10px] text-emerald-500 line-clamp-1">{appliedPromo.title}</div>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => { setAppliedPromo(null); setCoupon(''); }}
+                  className="text-emerald-300 hover:text-rose-500 transition-colors p-1"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
             {form.fullName && (
               <div className="mt-4 p-3 bg-slate-50 rounded-xl text-xs text-slate-500 space-y-1">
                 <div className="font-semibold text-slate-700">{form.fullName}</div>
@@ -356,6 +445,50 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      {/* ── Voucher Selection Modal ── */}
+      {showVoucherModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-bounce-in">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Ticket className="text-primary-600" /> Ưu đãi của bạn
+              </h3>
+              <button onClick={() => setShowVoucherModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 max-h-[400px] overflow-y-auto space-y-4">
+              {vouchers.length === 0 ? (
+                <div className="text-center py-10 text-slate-400">Bạn chưa có mã giảm giá nào.</div>
+              ) : (
+                vouchers.map(v => (
+                  <div key={v.id} 
+                    onClick={() => { setAppliedPromo(v); setShowVoucherModal(false); }}
+                    className="group border-2 border-slate-100 hover:border-primary-500 rounded-2xl p-4 cursor-pointer transition-all relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-primary-50 -mr-8 -mt-8 rounded-full group-hover:bg-primary-100 transition-colors" />
+                    <div className="relative">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="font-mono text-primary-700 font-bold bg-primary-50 px-2 py-0.5 rounded text-sm">{v.code}</span>
+                        <span className="font-bold text-emerald-600">Giảm {v.discount}%</span>
+                      </div>
+                      <div className="font-bold text-slate-800 text-sm">{v.title}</div>
+                      <div className="text-xs text-slate-400 mt-1">{v.description}</div>
+                      <div className="text-[10px] text-slate-300 mt-2">Hết hạn: {new Date(v.endDate).toLocaleDateString('vi-VN')}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="p-6 bg-slate-50 border-t border-slate-100">
+              <button onClick={() => setShowVoucherModal(false)} className="w-full py-3 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition-all">
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

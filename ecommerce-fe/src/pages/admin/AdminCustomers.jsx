@@ -4,6 +4,7 @@ import { Search, MessageCircle, Gift, CheckCircle, X, Send, AlertTriangle, UserC
 import { useSocket } from '../../context/SocketContext';
 import { useSearchParams } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
+import { toast } from 'react-hot-toast';
 
 const AdminCustomers = () => {
   const [searchParams] = useSearchParams();
@@ -172,9 +173,9 @@ const AdminCustomers = () => {
       await api.post(`/customers/${selectedUser?.id}/notify`, notifyData);
       setActiveModal(null);
       setNotifyData({ title: '', content: '', type: 'PROMO' });
-      alert('Notification sent successfully!');
+      toast.success('Gửi thông báo thành công! 🔔');
     } catch (err) {
-      alert('Failed to send notification');
+      toast.error('Lỗi khi gửi thông báo');
     }
   };
 
@@ -193,9 +194,9 @@ const AdminCustomers = () => {
       await api.patch(`/customers/${selectedUser.id}`, editData);
       setActiveModal(null);
       fetchCustomers();
-      alert('Cập nhật thông tin khách hàng thành công!');
+      toast.success('Cập nhật thông tin khách hàng thành công! ✨');
     } catch (err) {
-      alert('Lỗi cập nhật thông tin');
+      toast.error('Lỗi khi cập nhật thông tin');
     }
   };
 

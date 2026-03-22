@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { User, Bell, Package, Gift, Heart, LogOut, ChevronRight, AlertCircle, ShoppingBag } from 'lucide-react';
+import { User, Bell, Package, Gift, Heart, LogOut, ChevronRight, AlertCircle, ShoppingBag, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Profile = () => {
@@ -9,6 +9,7 @@ const Profile = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'notifications');
+  const [selectedNotif, setSelectedNotif] = useState(null);
   const navigate = useNavigate();
 
   // Cập nhật tab khi URL thay đổi
@@ -32,7 +33,8 @@ const Profile = () => {
 
   const fetchNotifications = async (token) => {
     try {
-      const res = await axios.get('http://localhost:3000/api/customers/notifications', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+      const res = await axios.get(`${apiUrl}/customers/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(res.data?.data || []);
@@ -133,7 +135,8 @@ const Profile = () => {
                     {notifications.map((notif) => (
                       <div 
                         key={notif.id} 
-                        className="group bg-white p-5 rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-lg hover:shadow-primary-600/5 transition-all duration-300 relative overflow-hidden"
+                        onClick={() => setSelectedNotif(notif)}
+                        className="group bg-white p-5 rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-lg hover:shadow-primary-600/5 transition-all duration-300 relative overflow-hidden cursor-pointer"
                       >
                         <div className="flex items-start gap-4">
                           <div className={`mt-1 h-10 w-10 shrink-0 rounded-xl flex items-center justify-center ${
@@ -144,7 +147,7 @@ const Profile = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-bold text-slate-900 mb-1 group-hover:text-primary-600 transition-colors uppercase tracking-tight">{notif.title}</h4>
-                            <p className="text-slate-600 text-sm leading-relaxed">{notif.content}</p>
+                            <p className="text-slate-600 text-sm leading-relaxed line-clamp-2">{notif.content}</p>
                             <span className="text-[11px] font-bold text-slate-400 mt-2 block uppercase tracking-widest">{new Date(notif.createdAt).toLocaleDateString()}</span>
                           </div>
                           <div className="opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
@@ -155,6 +158,52 @@ const Profile = () => {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Modal chi tiết thông báo */}
+            {selectedNotif && (
+              <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-zoom-in">
+                  <div className={`h-32 flex items-center justify-center relative ${
+                    selectedNotif.type === 'PROMO' ? 'bg-gradient-to-br from-pink-500 to-rose-400' : 
+                    selectedNotif.type === 'SYSTEM' ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-amber-400 to-orange-500'
+                  }`}>
+                    <button 
+                      onClick={() => setSelectedNotif(null)}
+                      className="absolute top-6 right-6 w-10 h-10 bg-black/10 hover:bg-black/20 text-white rounded-full flex items-center justify-center transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
+                    <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                      {selectedNotif.type === 'PROMO' ? <Gift size={32} className="text-white" /> : <AlertCircle size={32} className="text-white" />}
+                    </div>
+                  </div>
+                  
+                  <div className="p-8 space-y-6">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 block">{new Date(selectedNotif.createdAt).toLocaleDateString()}</span>
+                      <h3 className="text-2xl font-display font-bold text-slate-900 leading-tight uppercase tracking-tight italic">
+                        {selectedNotif.title}
+                      </h3>
+                    </div>
+                    
+                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                      <p className="text-slate-600 leading-relaxed font-medium">
+                        {selectedNotif.content}
+                      </p>
+                    </div>
+
+                    <div className="pt-2">
+                      <button 
+                        onClick={() => setSelectedNotif(null)}
+                        className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 uppercase tracking-widest text-xs"
+                      >
+                        Đã hiểu
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

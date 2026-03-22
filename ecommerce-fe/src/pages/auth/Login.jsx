@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/api';
 import { Mail, Lock, ArrowRight, UserCheck, AlertCircle } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ const Login = () => {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:3000/api/users/login', { email, password });
+      const res = await api.post('/users/login', { email, password });
       
       const { token, user } = res.data.data;
       
@@ -27,11 +28,13 @@ const Login = () => {
       // Báo hiệu cho ChatBox và các component khác
       window.dispatchEvent(new Event('storage'));
       
+      toast.success(`Chào mừng trở lại, ${user.email}! 👋`);
       // Redirect to home or profile
       navigate('/');
       window.location.reload(); // Refresh to update layout state
     } catch (err) {
       setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+      toast.error('Đăng nhập thất bại!');
     } finally {
       setLoading(false);
     }

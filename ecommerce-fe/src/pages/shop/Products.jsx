@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/api';
 import { Star, Search, SlidersHorizontal, ShoppingBag, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const Products = () => {
@@ -22,7 +22,7 @@ const Products = () => {
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
 
-      const res = await axios.get(`http://localhost:3000/api/products?${params.toString()}`);
+      const res = await api.get(`/products?${params.toString()}`);
       setProducts(res.data.data.data || []);
       setTotal(res.data.data.meta?.total || 0);
     } catch (err) {

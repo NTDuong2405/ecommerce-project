@@ -1,23 +1,20 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Search, CheckCircle, Save, AlertTriangle } from 'lucide-react';
+import { Search, CheckCircle, Save, AlertTriangle, Upload, FileSpreadsheet, Download } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 
 const AdminInventory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isImporting, setIsImporting] = useState(false);
   const { socket } = useSocket();
 
-  // Lưu trữ các stock thay đổi chưa lưu { [productId]: stock }
   const [editedStocks, setEditedStocks] = useState({});
   const [savingId, setSavingId] = useState(null);
-
-  // Lưu trữ trạng thái nháy update cho UI
   const [updatingIds, setUpdatingIds] = useState({});
-
-  // Toast Notification
   const [toast, setToast] = useState({ msg: '', type: '' });
+
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
     setTimeout(() => setToast({ msg: '', type: '' }), 3000);
@@ -43,14 +40,9 @@ const AdminInventory = () => {
   useEffect(() => {
     if (socket) {
       const handleStockUpdate = ({ productId, newStock }) => {
-        console.log(`%c⚡️ [Inventory Real-time] Product ${productId} -> ${newStock}`, "color: #10b981; font-weight: bold;");
-        
-        // Cập nhật số lượng trong danh sách
         setProducts(prev => prev.map(p => 
-          p.id == productId ? { ...p, stock: newStock } : p
+          String(p.id) === String(productId) ? { ...p, stock: newStock } : p
         ));
-
-        // Kích hoạt hiệu ứng nháy
         setUpdatingIds(prev => ({ ...prev, [productId]: true }));
         setTimeout(() => {
           setUpdatingIds(prev => {
@@ -60,49 +52,71 @@ const AdminInventory = () => {
           });
         }, 2000);
       };
-
       socket.on('stock-update', handleStockUpdate);
       return () => socket.off('stock-update', handleStockUpdate);
     }
   }, [socket]);
 
-
   const handleStockChange = (id, value) => {
-    setEditedStocks(prev => ({
-      ...prev,
-      [id]: parseInt(value) || 0
-    }));
+    setEditedStocks(prev => ({ ...prev, [id]: parseInt(value) || 0 }));
   };
 
   const handleSaveStock = async (product) => {
     const newStock = editedStocks[product.id];
     if (newStock === undefined || newStock === product.stock) return;
-
     try {
       setSavingId(product.id);
-      // Gọi API update sản phẩm (tái sử dụng API PUT /api/products/:id)
-      await api.put(`/products/${product.id}`, {
-        stock: newStock
-      });
-      showToast('Cập nhật tồn kho thành công!');
-      
-      // Cập nhật state local
+      await api.put(`/products/${product.id}`, { stock: newStock });
+      showToast('Cập nhật tồn kho thành công! ✨');
       setProducts(products.map(p => p.id === product.id ? { ...p, stock: newStock } : p));
-      
       const newEdited = {...editedStocks};
       delete newEdited[product.id];
       setEditedStocks(newEdited);
     } catch (err) {
-      console.error(err);
-      showToast('Lỗi cập nhật kho (Vui lòng thử lại)!', 'error');
+      showToast('Lỗi cập nhật kho!', 'error');
     } finally {
       setSavingId(null);
     }
   };
 
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      setIsImporting(true);
+      await api.post('/products/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      showToast('Nhập dữ liệu Excel thành công! 📦');
+      fetchProducts();
+    } catch (err) {
+      showToast('Lỗi khi nhập file Excel!', 'error');
+    } finally {
+      setIsImporting(false);
+      event.target.value = '';
+    }
+  };
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const res = await api.get('/products/export-template', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'VibeCart_Stock_Template.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      showToast('Lỗi khi tải file mẫu!', 'error');
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in-up relative">
-      {/* Toast Notification Tự dọn */}
       {toast.msg && (
         <div className={`fixed top-8 right-8 z-[100] text-white px-6 py-4 rounded-xl shadow-xl font-medium animate-fade-in-up flex items-center gap-3 ${toast.type === 'error' ? 'bg-red-600' : 'bg-emerald-600'}`}>
           {toast.type === 'error' ? <AlertTriangle size={22} className="text-red-200" /> : <CheckCircle size={22} className="text-emerald-200" />}
@@ -110,15 +124,27 @@ const AdminInventory = () => {
         </div>
       )}
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-display font-bold text-slate-900">Inventory Management</h2>
           <p className="text-slate-500 text-sm mt-1">Control your stock levels and availability in one click.</p>
         </div>
+        <div className="flex gap-3">
+           <button 
+              onClick={handleDownloadTemplate}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all shadow-md shadow-blue-600/20 font-bold text-sm"
+           >
+              <Download size={18} />
+              Tải file mẫu
+           </button>
+           <label className={`flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg cursor-pointer transition-all shadow-md shadow-emerald-600/20 font-bold text-sm ${isImporting ? 'opacity-50' : ''}`}>
+              <FileSpreadsheet size={18} />
+              {isImporting ? 'Đang xử lý...' : 'Nhập từ Excel'}
+              <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleFileUpload} disabled={isImporting} />
+           </label>
+        </div>
       </div>
 
-      {/* Search */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
         <div className="relative w-full sm:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -132,7 +158,6 @@ const AdminInventory = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

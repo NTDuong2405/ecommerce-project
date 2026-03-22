@@ -1,163 +1,188 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { BarChart3, TrendingUp, Package, PieChart as PieIcon, Activity, ArrowUpRight } from 'lucide-react';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell, PieChart, Pie, Legend 
+  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line 
 } from 'recharts';
+import { TrendingUp, Users, ShoppingBag, PieChart as ChartPieIcon, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
-const COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'];
+const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 const AdminAnalytics = () => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({
+    monthlyRevenue: [],
+    categoryStats: [],
+    retention: [],
+    paymentStats: []
+  });
   const [loading, setLoading] = useState(true);
+  const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/analytics?year=${year}`);
+        setData(res.data.data);
+      } catch (err) {
+        console.error("Lỗi fetch analytics:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [year]);
 
-  const fetchStats = async () => {
-    try {
-      const res = await api.get('/dashboard/stats');
-      setData(res.data.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading || !data) return <div className="p-10 text-center text-slate-500 animate-pulse font-medium">Báo cáo đang được xử lý...</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    </div>
+  );
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
-      <div className="flex justify-between items-end">
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">Business Analytics</h2>
-          <p className="text-slate-500 mt-2 font-medium">Phân tích chuyên sâu về hiệu suất kinh doanh</p>
+          <h2 className="text-3xl font-display font-bold text-slate-900 flex items-center gap-3">
+            <ChartPieIcon className="text-primary-600" /> Deep Analytics
+          </h2>
+          <p className="text-slate-500 mt-1">Phân tích dữ liệu kinh doanh chuyên sâu dành riêng cho Admin.</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-2 text-sm font-bold text-slate-600">
-           <Activity size={16} className="text-emerald-500" />
-           Cập nhật: {new Date().toLocaleTimeString()}
+        <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+          <Calendar size={18} className="text-slate-400 ml-2" />
+          <select 
+            className="bg-transparent border-none focus:ring-0 font-bold text-slate-700 outline-none"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+          >
+            <option value="2026">Năm 2026</option>
+            <option value="2025">Năm 2025</option>
+          </select>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Doanh thu & Biểu đồ đường */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h3 className="text-xl font-bold text-slate-800 font-display">Biểu đồ Tăng trưởng</h3>
-              <p className="text-sm text-slate-400">Doanh thu 7 ngày gần nhất</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-400 font-medium uppercase tracking-widest text-[10px]">Total Revenue</p>
-              <p className="text-2xl font-bold text-emerald-600 font-display">${data.totalRevenue.toLocaleString()}</p>
-            </div>
-          </div>
-          
-          <div className="h-80 w-full mt-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Doanh thu theo tháng */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+             Tăng trưởng doanh thu ({year})
+          </h3>
+          <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.chartData}>
-                <defs>
-                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
+              <BarChart data={data.monthlyRevenue}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
                 <Tooltip 
-                  contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
-                  itemStyle={{fontWeight: 'bold'}}
+                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                   formatter={(value) => [`$${value.toLocaleString()}`, 'Doanh thu']}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
-              </AreaChart>
+                <Bar dataKey="revenue" fill="#0ea5e9" radius={[4, 4, 0, 0]} barSize={30} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Trạng thái đơn hàng - Pie Chart */}
-        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
-            <div className="w-full text-left mb-6">
-                <h3 className="text-xl font-bold text-slate-800 font-display">Tỉ trọng Đơn hàng</h3>
-                <p className="text-sm text-slate-400">Phân bổ theo trạng thái</p>
-            </div>
-            <div className="h-64 w-full relative">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={data.statusStats}
-                            cx="50%" cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="value"
-                        >
-                            {data.statusStats.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend iconType="circle" />
-                    </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                    <p className="text-2xl font-bold text-slate-800">{data.totalOrders}</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Orders</p>
-                </div>
-            </div>
-            <div className="w-full mt-6 space-y-3">
-                {data.statusStats.map((s, i) => (
-                    <div key={i} className="flex justify-between items-center text-sm">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full" style={{backgroundColor: COLORS[i % COLORS.length]}}></div>
-                            <span className="text-slate-600 font-medium uppercase tracking-tight text-xs">{s.name}</span>
-                        </div>
-                        <span className="font-bold text-slate-800">{s.value}</span>
-                    </div>
-                ))}
-            </div>
+        {/* Doanh thu theo Danh mục */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+             Tỉ trọng doanh thu Category
+          </h3>
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data.categoryStats}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={80}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {data.categoryStats.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -10px rgb(0 0 0 / 0.1)' }}
+                   formatter={(value) => [`$${value.toLocaleString()}`, 'Tổng thu']}
+                />
+                <Legend iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        {/* Top Product List */}
-        <div className="lg:col-span-3 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                   <h3 className="text-xl font-bold text-slate-800 font-display flex items-center gap-2">
-                       <TrendingUp className="text-blue-500" /> Sản phẩm Bán chạy
-                   </h3>
-                   <p className="text-sm text-slate-400">Dựa trên số lượng đơn hàng đã bán</p>
+        {/* Tỉ lệ khách hàng */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+             Tỉ lệ khách hàng mới & cũ
+          </h3>
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="h-64 w-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data.retention}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    <Cell fill="#10b981" />
+                    <Cell fill="#f59e0b" />
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex-1 space-y-4">
+              {data.retention.map((r, i) => (
+                <div key={i} className="bg-slate-50 p-4 rounded-2xl flex justify-between items-center">
+                   <div className="flex items-center gap-3">
+                     <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                     <span className="font-bold text-slate-700">{r.name}</span>
+                   </div>
+                   <span className="font-mono font-bold text-slate-900">{r.value} khách</span>
                 </div>
+              ))}
+              <p className="text-xs text-slate-400 mt-4 leading-relaxed italic">
+                * Khách quay lại là khách hàng đã phát sinh từ 2 đơn hàng thành công trở lên.
+              </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                {data.topProducts.map((p, i) => (
-                    <div key={i} className="bg-slate-50 p-6 rounded-3xl border border-slate-100 hover:border-blue-200 transition-all hover:shadow-lg group">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 mb-4 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
-                            <Package size={24} />
-                        </div>
-                        <h4 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[40px]">{p.name}</h4>
-                        <div className="mt-4 flex justify-between items-end">
-                            <div>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Đã bán</p>
-                                <p className="text-xl font-bold text-slate-900">{p.sales}</p>
-                            </div>
-                            <div className="bg-emerald-50 text-emerald-600 p-1.5 rounded-lg">
-                                <ArrowUpRight size={16} />
-                            </div>
-                        </div>
-                        <div className="mt-4 pt-4 border-t border-slate-200">
-                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Revenue</p>
-                             <p className="text-sm font-bold text-slate-800">${p.revenue.toLocaleString()}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+          </div>
         </div>
 
+        {/* Phương thức thanh toán */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-8 opacity-5">
+            <ShoppingBag size={120} />
+          </div>
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 relative">
+             Phân tích thanh toán
+          </h3>
+          <div className="space-y-4 relative">
+            {data.paymentStats.map((p, i) => (
+              <div key={i} className="group flex items-center justify-between p-4 border border-slate-100 rounded-2xl hover:border-primary-500 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center font-bold text-primary-600 group-hover:bg-primary-50">
+                    {p.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-800">{p.name}</div>
+                    <div className="text-xs text-slate-400">{p.orderCount} giao dịch</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                   <div className="font-bold text-slate-900">${p.totalValue?.toLocaleString()}</div>
+                   <div className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Revenue</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

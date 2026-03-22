@@ -21,6 +21,7 @@ model User {
   email    String   @unique
   password String
   role     UserRole @default(USER)
+  fullName String?
   phone    String?
   birthday DateTime?
 
@@ -29,6 +30,7 @@ model User {
   sentMessages ChatMessage[] @relation("SentMessages")
   receivedMessages ChatMessage[] @relation("ReceivedMessages")
   notifications Notification[]
+  promotions    Promotion[]    @relation("UserPromotions")
   createdAt DateTime @default(now())
 }
 
@@ -64,6 +66,8 @@ model Order {
   id              Int         @id @default(autoincrement())
   userId          Int?        // Optional for guest orders
   totalPrice      Float
+  discountAmount  Float?      @default(0)
+  couponCode      String?
   status          OrderStatus @default(PENDING)
   
   // Thông tin khách hàng & giao hàng
@@ -98,6 +102,7 @@ model Product {
   id          Int              @id @default(autoincrement())
   name        String
   description String?
+  category    String?
   createdAt   DateTime         @default(now())
   price       Float
   stock       Int              @default(0)
@@ -120,6 +125,8 @@ model ProductVariant {
 
 model Promotion {
   id          Int      @id @default(autoincrement())
+  userId      Int?     // Dành riêng cho ai (nếu có)
+  code        String   @unique @default(cuid())
   title       String
   description String
   discount    Int?     // Percentage or fixed value
@@ -127,6 +134,8 @@ model Promotion {
   endDate     DateTime
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
+
+  user        User?    @relation("UserPromotions", fields: [userId], references: [id])
 }
 
 model ProductImage {

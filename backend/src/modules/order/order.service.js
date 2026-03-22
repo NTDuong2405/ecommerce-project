@@ -2,7 +2,10 @@ import { prisma } from '../../config/prisma.js'
 import { emitStockUpdate, emitNewOrder } from '../../utils/socket.js'
 
 export const createOrder = async (userId, data) => {
-  const { items, totalPrice, customerName, customerEmail, customerPhone, address, city, note, shippingMethod, shippingPrice } = data;
+  const { 
+    items, totalPrice, customerName, customerEmail, customerPhone, address, city, note, 
+    shippingMethod, shippingPrice, discountAmount, couponCode 
+  } = data;
 
   if (!items || items.length === 0) {
     throw new Error('No items in order');
@@ -38,6 +41,8 @@ export const createOrder = async (userId, data) => {
       data: {
         userId: userId || null,
         totalPrice: Number(totalPrice),
+        discountAmount: Number(discountAmount) || 0,
+        couponCode: couponCode || null,
         customerName,
         customerEmail,
         customerPhone,
