@@ -12,13 +12,17 @@ const server = http.createServer(app)
 // Khởi chạy Socket.io
 initSocket(server)
 
-app.use(cors())
+app.use(cors({
+  origin: '*', // Sau này bạn có thể thay bằng domain frontend của VERCEL để bảo mật hơn
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}))
 app.use(express.json())
 
 app.use('/api', routes)
 
-const PORT = 3000
-server.listen(PORT, () => {
+const PORT = process.env.PORT || 3000
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server & Real-time Socket running on port ${PORT} 🚀`)
 })
 // --- Trigger: Socket-Fix reload @ 2026-03-21T15:50 ---
