@@ -77,28 +77,43 @@ export const getCustomers = async (query = {}) => {
 
 
 export const sendChat = async ({ senderId, receiverId, content, guestId }) => {
-  const sId = senderId ? Number(senderId) : null;
-  const rId = receiverId ? Number(receiverId) : null;
+  let sId = senderId ? Number(senderId) : null;
+  let rId = receiverId ? Number(receiverId) : null;
 
-  console.log(`💾 [Service] Preparing chat: From ${sId} (orig: ${senderId}) To ${rId} (orig: ${receiverId}) | Guest: ${guestId}`);
+  console.log(`💾 [Service] Validating chat IDs: From ${sId} To ${rId}`);
   
-  // Kiểm tra nếu cả dúng và sai đều NaN thì ép về null để Prisma không lỗi
+  // KIỂM TRA SỰ TỒN TẠI TRONG DATABASE ĐỂ TRÁNH LỖI FK (Khóa ngoại)
+  if (sId && !isNaN(sId)) {
+    const user = await prisma.user.findUnique({ where: { id: sId } });
+    if (!user) {
+      console.log(`⚠️ [Service] Sender ID ${sId} not found in DB. Falling back to null.`);
+      sId = null;
+    }
+  }
+
+  if (rId && !isNaN(rId)) {
+    const user = await prisma.user.findUnique({ where: { id: rId } });
+    if (!user) {
+      console.log(`⚠️ [Service] Receiver ID ${rId} not found in DB. Falling back to null.`);
+      rId = null;
+    }
+  }
+
   const message = await prisma.chatMessage.create({
     data: {
-      senderId: (sId && !isNaN(sId)) ? sId : null,
-      receiverId: (rId && !isNaN(rId)) ? rId : null,
+      senderId: sId,
+      receiverId: rId,
       guestId: guestId ? String(guestId) : null,
       content: content || "(Trống)"
     }
   });
 
   // PHÁT THÔNG BÁO CHO ADMIN NẾU CUSTOMER GỬI TIN NHẮN TỚI
-  // Nếu người nhận không phải Admin (ID != 1), ta vẫn check role admin trong controller nếu cần
-  if (String(rId) === "1") {
-    const customerId = senderId || guestId;
+  if (String(rId) === "1" || (!rId && guestId)) {
+    const customerId = sId || guestId;
     await createAdminNotification({
       title: 'New Chat!',
-      content: `Msg from: ${guestId ? 'Guest_' + guestId : 'Customer_#' + senderId}: ${content?.slice(0, 30)}...`,
+      content: `Msg from: ${guestId ? 'Guest_' + guestId : 'Customer_#' + sId}: ${content?.slice(0, 30)}...`,
       type: 'CHAT',
       path: `/admin/customers?customerId=${customerId}`
     });
