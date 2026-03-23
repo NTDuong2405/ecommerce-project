@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Plus, Search, Edit2, Trash2, Filter, X, AlertTriangle, CheckCircle, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Filter, X, AlertTriangle, CheckCircle, Package, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 import Pagination from '../../components/Pagination';
 
@@ -16,10 +16,13 @@ const AdminProducts = () => {
   // States quản lý Modal Thêm/Sửa sản phẩm
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
-  const [currentProduct, setCurrentProduct] = useState({ name: '', description: '', price: 0, stock: 0, images: [] });
+  const [currentProduct, setCurrentProduct] = useState({ 
+    name: '', description: '', category: '', price: 0, stock: 0, images: [], sizeChart: '', variants: [] 
+  });
   const [newImageUrl, setNewImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
+  const [importing, setImporting] = useState(false);
 
   // State quản lý Modal Xác nhận Xóa
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
@@ -84,7 +87,7 @@ const AdminProducts = () => {
   // Mở modal thêm mới
   const handleOpenAdd = () => {
     setModalMode('add');
-    setCurrentProduct({ name: '', description: '', price: '', stock: 0, images: [] });
+    setCurrentProduct({ name: '', description: '', category: 'General', price: '', stock: 0, images: [], sizeChart: '', variants: [] });
     setNewImageUrl('');
     setIsModalOpen(true);
   };
@@ -96,9 +99,12 @@ const AdminProducts = () => {
       id: product.id,
       name: product.name, 
       description: product.description || '', 
+      category: product.category || 'General',
       price: product.price, 
       stock: product.stock,
-      images: product.images?.map(img => img.url) || []
+      sizeChart: product.sizeChart || '',
+      images: product.images?.map(img => img.url) || [],
+      variants: product.variants || []
     });
     setNewImageUrl('');
     setIsModalOpen(true);
@@ -123,9 +129,12 @@ const AdminProducts = () => {
       const payload = {
         name: currentProduct.name,
         description: currentProduct.description,
+        category: currentProduct.category,
         price: Number(currentProduct.price),
         stock: Number(currentProduct.stock),
-        images: currentProduct.images
+        images: currentProduct.images,
+        sizeChart: currentProduct.sizeChart,
+        variants: currentProduct.variants
       };
 
       if (modalMode === 'add') {
@@ -140,9 +149,49 @@ const AdminProducts = () => {
       fetchProducts();
     } catch (error) {
       console.error("Lỗi khi lưu sản phẩm:", error);
-      showToast("Đã xảy ra lỗi khi lưu!", "error");
+      showToast("Đã xảy ra lỗi khi lưu: " + (error.response?.data?.message || error.message), "error");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleImportExcel = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setImporting(true);
+    try {
+      const res = await api.post('/products/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      showToast(`Import thành công ${res.data.count} sản phẩm!`);
+      fetchProducts();
+    } catch (error) {
+      showToast("Lỗi import: " + (error.response?.data?.message || error.message), "error");
+    } finally {
+      setImporting(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      showToast("Đang chuẩn bị file tải về...");
+      const res = await api.get('/products/export-template', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `VibeCart_Products_Export_Template_${new Date().toLocaleDateString('vi-VN')}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      showToast("Tải file thành công!");
+    } catch (error) {
+       showToast("Lỗi khi kết xuất file!", "error");
     }
   };
 
@@ -181,13 +230,27 @@ const AdminProducts = () => {
           <h2 className="text-2xl font-display font-bold text-slate-900">Products Management</h2>
           <p className="text-slate-500 text-sm mt-1">Manage your catalog, inventory, and variants.</p>
         </div>
-        <button 
-          onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm"
-        >
-          <Plus size={18} />
-          <span>Add Product</span>
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={handleExportExcel}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 transition-all shadow-sm"
+          >
+            <Download size={18} />
+            <span>Export ALL</span>
+          </button>
+          <label className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm border ${importing ? 'bg-slate-50 text-slate-400' : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'}`}>
+            <Package size={18} />
+            <span>{importing ? 'Importing...' : 'Import Excel'}</span>
+            <input type="file" className="hidden" accept=".xlsx,.xls,.csv" onChange={handleImportExcel} disabled={importing} />
+          </label>
+          <button 
+            onClick={handleOpenAdd}
+            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm"
+          >
+            <Plus size={18} />
+            <span>Add Product</span>
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search */}
@@ -355,7 +418,7 @@ const AdminProducts = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Giá <span className="text-red-500">*</span>
+                    Giá chính (đ) <span className="text-red-500">*</span>
                   </label>
                   <input 
                     type="number" 
@@ -373,7 +436,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Số lượng Kho <span className="text-red-500">*</span>
+                    Tổng kho <span className="text-red-500">*</span>
                   </label>
                   <input 
                     type="number" 
@@ -384,6 +447,53 @@ const AdminProducts = () => {
                     onChange={e => setCurrentProduct({...currentProduct, stock: e.target.value})}
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1 text-xs uppercase tracking-wider">Size Chart (JSON - vd: {"{\"S\": \"40-50kg\"}"})</label>
+                <textarea 
+                  rows={2}
+                  placeholder='{"S": "40-50kg", "M": "50-60kg"}'
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono text-xs"
+                  value={currentProduct.sizeChart}
+                  onChange={e => setCurrentProduct({...currentProduct, sizeChart: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="flex justify-between items-center">
+                   <label className="text-xs font-bold text-slate-500 uppercase">Phân loại (Variants)</label>
+                   <button 
+                     type="button"
+                     onClick={() => setCurrentProduct({...currentProduct, variants: [...(currentProduct.variants || []), { size: '', color: '', stock: 0, sku: '' }]})}
+                     className="text-primary-600 text-xs font-bold hover:underline"
+                   >
+                     + Thêm phân loại
+                   </button>
+                </div>
+                
+                {(currentProduct.variants || []).map((v, idx) => (
+                  <div key={idx} className="grid grid-cols-4 gap-2 items-end">
+                    <div>
+                      <input type="text" placeholder="Size" className="w-full px-2 py-1 text-xs border rounded" value={v.size} onChange={e => {
+                        const newV = [...currentProduct.variants]; newV[idx].size = e.target.value; setCurrentProduct({...currentProduct, variants: newV});
+                      }} />
+                    </div>
+                    <div>
+                      <input type="text" placeholder="Màu" className="w-full px-2 py-1 text-xs border rounded" value={v.color} onChange={e => {
+                        const newV = [...currentProduct.variants]; newV[idx].color = e.target.value; setCurrentProduct({...currentProduct, variants: newV});
+                      }} />
+                    </div>
+                    <div>
+                      <input type="number" placeholder="Kho" className="w-full px-2 py-1 text-xs border rounded" value={v.stock} onChange={e => {
+                        const newV = [...currentProduct.variants]; newV[idx].stock = e.target.value; setCurrentProduct({...currentProduct, variants: newV});
+                      }} />
+                    </div>
+                    <button type="button" onClick={() => {
+                        const newV = currentProduct.variants.filter((_, i) => i !== idx); setCurrentProduct({...currentProduct, variants: newV});
+                    }} className="text-red-400 hover:text-red-600 px-2 py-1">×</button>
+                  </div>
+                ))}
               </div>
 
               <div className="space-y-3">

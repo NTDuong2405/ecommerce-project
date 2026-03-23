@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { Star, ShoppingBag, ChevronLeft, Check, Shield, Truck, RotateCcw, Heart } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 const ProductDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const { addToCart } = useCart();
   const { socket } = useSocket();
   const [product, setProduct] = useState(null);
@@ -18,6 +19,45 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  
+  // States for Variants
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [showSizeChart, setShowSizeChart] = useState(false);
+
+  // Initialize selected variants from URL or first available
+  useEffect(() => {
+    if (product) {
+      const urlSize = (searchParams.get('size') || '').trim();
+      const urlColor = (searchParams.get('color') || '').trim();
+      
+      // Get unique sizes and colors
+      let sizes = [...new Set((product.variants || []).filter(v => v?.size).map(v => v.size))];
+      const colors = [...new Set((product.variants || []).filter(v => v?.color).map(v => v.color))];
+      
+      // If no variants, try to get sizes from chart
+      if (sizes.length === 0 && product.sizeChart) {
+        try {
+          const chart = JSON.parse(product.sizeChart);
+          sizes = Object.keys(chart);
+        } catch (e) {}
+      }
+      
+      console.log(`[VARIANT_INIT] URL Size: "${urlSize}", URL Color: "${urlColor}", Found Sizes:`, sizes);
+
+      if (urlSize && sizes.includes(urlSize)) {
+        setSelectedSize(urlSize);
+      } else if (sizes.length > 0 && !selectedSize) {
+        setSelectedSize(sizes[0]);
+      }
+
+      if (urlColor && colors.includes(urlColor)) {
+        setSelectedColor(urlColor);
+      } else if (colors.length > 0 && !selectedColor) {
+        setSelectedColor(colors[0]);
+      }
+    }
+  }, [product, searchParams]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -50,9 +90,17 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
-    addToCart(product, quantity);
+
+    // Đính kèm biến thể đã chọn trước khi đưa vào giỏ hàng
+    const productData = {
+      ...product,
+      selectedSize,
+      selectedColor
+    };
+
+    addToCart(productData, quantity);
     setAdded(true);
-    toast.success(`Đã thêm ${product.name} vào giỏ hàng! 🛒`);
+    toast.success(`Đã thêm ${product.name} (${selectedSize || ''} - ${selectedColor || ''}) vào giỏ hàng! 🛒`);
     setTimeout(() => setAdded(false), 2000);
   };
 
@@ -210,7 +258,152 @@ const ProductDetail = () => {
 
           {/* Description */}
           {product.description && (
-            <p className="text-slate-600 leading-relaxed">{product.description}</p>
+            <p className="text-slate-600 leading-relaxed text-sm">{product.description}</p>
+          )}
+
+          {/* ────── SIZE & COLOR SELECTION ────── */}
+          <div className="space-y-6">
+            {product.variants?.length > 0 ? (
+              <>
+                {/* Color Selector */}
+                {[...new Set((product.variants || []).filter(v => v?.color).map(v => v.color))].length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-bold text-slate-900 uppercase tracking-wide">Màu sắc: {selectedColor || 'Chưa chọn'}</span>
+                    </div>
+                  <div className="flex flex-wrap gap-2">
+                    {[...new Set((product.variants || []).filter(v => v?.color).map(v => v.color))].map(color => (
+                          <button
+                            key={color}
+                            onClick={() => setSelectedColor(color)}
+                            className={`min-w-[70px] px-4 py-2 rounded-xl text-[13px] font-bold transition-all border-2 ${
+                              selectedColor === color 
+                                ? 'border-slate-900 bg-slate-900 text-white shadow-md' 
+                                : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200'
+                            }`}
+                          >
+                            {color}
+                          </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Size Selector */}
+                {[...new Set((product.variants || []).filter(v => v?.size).map(v => v.size))].length > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-slate-900 uppercase tracking-wide text-xs">Kích cỡ:</span>
+                        <span className="text-sm font-black text-slate-900">{selectedSize || 'Chưa chọn'}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {[...new Set((product.variants || []).filter(v => v?.size).map(v => v.size))].map(size => (
+                          <button
+                            key={size}
+                            onClick={() => setSelectedSize(size)}
+                            className={`w-11 h-11 rounded-xl text-sm font-black transition-all border-2 flex items-center justify-center ${
+                              selectedSize === size 
+                                ? 'border-slate-900 bg-slate-900 text-white shadow-md scale-105' 
+                                : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200'
+                            }`}
+                          >
+                            {size}
+                          </button>
+                      ))}
+                    </div>
+                    
+                    {/* Weight Hint */}
+                    {product.sizeChart && selectedSize && (() => {
+                      try {
+                        const chart = JSON.parse(product.sizeChart);
+                        const weightStr = chart[selectedSize];
+                        if (weightStr) {
+                          return (
+                            <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 flex items-center gap-3 animate-fade-in-up">
+                              <Shield size={18} className="text-emerald-600" />
+                              <div className="text-[13px] leading-tight text-emerald-900">
+                                 Size <span className="font-black">{selectedSize}</span> gợi ý cho cân nặng <span className="font-black italic">{weightStr}</span>.
+                              </div>
+                            </div>
+                          );
+                        }
+                      } catch (e) { return null; }
+                    })()}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="py-2">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">Sản phẩm này không có phân loại riêng</span>
+              </div>
+            )}
+          </div>
+
+          {/* ────── SIZE & COLOR VISUAL CHART ────── */}
+          {(product.sizeChart || (product.variants?.length > 0)) && (
+            <div className="pt-6 border-t border-slate-100 animate-fade-in-up">
+              <div className="flex items-center justify-between mb-4">
+                 <div className="flex items-center gap-2">
+                    <Shield size={16} className="text-primary-600" />
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Gợi ý chọn size và cân nặng</h3>
+                 </div>
+                 <span className="text-[10px] text-slate-400 font-medium italic">Chọn theo cân nặng của bạn</span>
+              </div>
+              
+              {product.sizeChart ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {(() => {
+                    try {
+                      const chart = JSON.parse(product.sizeChart);
+                      return Object.entries(chart).map(([s, weight]) => (
+                        <div 
+                          key={s} 
+                          onClick={() => setSelectedSize(s)}
+                          className={`cursor-pointer group relative p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center text-center ${
+                            selectedSize === s 
+                              ? 'border-primary-600 bg-primary-50/50 ring-4 ring-primary-100 shadow-sm' 
+                              : 'border-slate-100 bg-white hover:border-slate-200 hover:shadow-md'
+                          }`}
+                        >
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center mb-2 transition-colors ${selectedSize === s ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200'}`}>
+                             <span className="text-sm font-black">{s}</span>
+                          </div>
+                          <div className="text-[9px] uppercase font-bold text-slate-400 tracking-tighter mb-1 select-none">Cân nặng gợi ý</div>
+                          <div className={`text-xs font-black transition-colors ${selectedSize === s ? 'text-primary-900' : 'text-slate-700'}`}>
+                             {weight}
+                          </div>
+                          
+                          {selectedSize === s && (
+                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-md border-2 border-white animate-bounce-short">
+                               <Check size={10} strokeWidth={4} />
+                            </div>
+                          )}
+                        </div>
+                      ));
+                    } catch (e) {
+                      return (
+                        <div className="col-span-full bg-slate-50 rounded-2xl p-6 text-center border border-slate-100 italic text-slate-400 text-xs">
+                           Bảng size: {product.sizeChart}
+                        </div>
+                      );
+                    }
+                  })()}
+                </div>
+              ) : (
+                <div className="bg-slate-50 rounded-2xl p-6 text-center border-2 border-dashed border-slate-200">
+                   <p className="text-xs text-slate-400 font-medium italic">Thông tin bảng size đang được cập nhật...</p>
+                </div>
+              )}
+              
+              {/* Extra helper hint */}
+              {selectedSize && (
+                 <p className="mt-4 text-[10px] text-slate-400 text-center italic">
+                    * Bạn đang chọn <span className="text-primary-600 font-bold uppercase">Size {selectedSize}</span>. Vui lòng kiểm tra lại chiều cao nếu cần tỉ mỉ hơn.
+                 </p>
+              )}
+            </div>
           )}
 
           {/* Stock badge */}
@@ -270,13 +463,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Back link */}
-      <div className="mt-12">
-        <Link to="/products" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 font-medium transition-colors group">
-          <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          Back to Collection
-        </Link>
-      </div>
     </div>
   );
 };

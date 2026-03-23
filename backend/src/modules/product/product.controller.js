@@ -57,6 +57,7 @@ export const update = async (req, res) => {
       data
     })
   } catch (err) {
+    console.error("LỖI UPDATE:", err);
     res.status(400).json({ message: err.message })
   }
 }

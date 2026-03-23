@@ -47,11 +47,11 @@ const Cart = () => {
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => (
             <div
-              key={item.productId}
+              key={item.cartKey}
               className="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 group hover:shadow-md transition-shadow relative"
             >
               {/* Image */}
-              <Link to={`/product/${item.productId}`} className="shrink-0 w-full sm:w-auto">
+              <Link to={`/product/${item.productId}?size=${item.size || ''}&color=${item.color || ''}`} className="shrink-0 w-full sm:w-auto">
                 <img
                   src={item.image || FALLBACK_IMAGE}
                   alt={item.name}
@@ -61,13 +61,21 @@ const Cart = () => {
 
               {/* Info */}
               <div className="flex-1 min-w-0 pr-10 sm:pr-0">
-                <Link to={`/product/${item.productId}`} className="hover:text-primary-600 transition-colors">
+                <Link to={`/product/${item.productId}?size=${item.size || ''}&color=${item.color || ''}`} className="hover:text-primary-600 transition-colors">
                   <h3 className="font-bold text-slate-900 font-display text-lg mb-1 line-clamp-2 leading-tight">{item.name}</h3>
                 </Link>
-                <div className="flex items-center gap-3">
-                  <span className="text-primary-600 font-bold text-base">{formatPrice(item.price)}</span>
-                  {item.discountPercentage > 0 && (
-                    <span className="text-slate-400 text-xs line-through font-medium">{formatPrice(item.originalPrice)}</span>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
+                  <div className="flex items-center gap-3">
+                    <span className="text-primary-600 font-bold text-base">{formatPrice(item.price)}</span>
+                    {item.discountPercentage > 0 && (
+                      <span className="text-slate-400 text-xs line-through font-medium">{formatPrice(item.originalPrice)}</span>
+                    )}
+                  </div>
+                  {(item.size || item.color) && (
+                    <div className="flex items-center gap-2">
+                       {item.size && <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Size: {item.size}</span>}
+                       {item.color && <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Color: {item.color}</span>}
+                    </div>
                   )}
                 </div>
               </div>
@@ -76,14 +84,14 @@ const Cart = () => {
               <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-6 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-50 mt-2 sm:mt-0">
                 <div className="flex items-center gap-1 bg-slate-100 rounded-2xl px-2 py-1.5 shrink-0">
                   <button
-                    onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                    onClick={() => updateQuantity(item.cartKey, item.quantity - 1)}
                     className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 rounded-xl hover:bg-white shadow-sm transition-all"
                   >
                     <Minus size={14} />
                   </button>
                   <span className="w-9 text-center font-bold text-slate-900 text-sm">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.cartKey, item.quantity + 1)}
                     disabled={item.quantity >= item.stock}
                     className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 rounded-xl hover:bg-white shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -99,7 +107,7 @@ const Cart = () => {
 
               {/* Absolute Remove Button for mobile-friendly feel */}
               <button
-                onClick={() => removeItem(item.productId)}
+                onClick={() => removeItem(item.cartKey)}
                 className="absolute top-4 right-4 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                 title="Remove Item"
               >

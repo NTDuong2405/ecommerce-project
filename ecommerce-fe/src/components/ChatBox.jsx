@@ -14,6 +14,15 @@ const ChatBox = () => {
   const scrollRef = useRef(null);
   const chatRef = useRef(null);
 
+  // Identity detection (optimized: computed once per render)
+  let curUid = null;
+  let curGid = null;
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser && storedUser !== 'undefined') curUid = JSON.parse(storedUser)?.id;
+    curGid = localStorage.getItem('vibe_chat_guest_id');
+  } catch (e) {}
+
   // 0. Đóng khi click bên ngoài hoặc nhấn ESC
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -105,7 +114,7 @@ const ChatBox = () => {
         const isRelated = 
           (msg.guestId && String(msg.guestId) === String(myId)) ||
           (msg.senderId && String(msg.senderId) === String(myId) && String(msg.receiverId) === "1") ||
-          (String(msg.senderId) === "1" && msg.receiverId && String(msg.receiverId) === String(myId));
+          (String(msg.senderId) === "1" && (String(msg.receiverId) === String(myId) || String(msg.guestId) === String(myId)));
 
         if (isRelated) {
           console.log("✅ Message matches current user! Adding to state.");
@@ -199,18 +208,9 @@ const ChatBox = () => {
               </div>
             ) : (
               messages.map((msg, idx) => {
-                let currentUserId = null;
-                let currentGuestId = null;
-                try {
-                  const storedUser = localStorage.getItem('user');
-                  if (storedUser) currentUserId = JSON.parse(storedUser)?.id;
-                  currentGuestId = localStorage.getItem('vibe_chat_guest_id');
-                } catch (e) {}
-
-                const myId = currentUserId || currentGuestId;
-                const isMe = currentUserId 
-                  ? String(msg.senderId) === String(currentUserId)
-                  : (msg.guestId && String(msg.guestId) === String(currentGuestId) && !msg.senderId);
+                const isMe = curUid 
+                  ? String(msg.senderId) === String(curUid)
+                  : (msg.guestId && String(msg.guestId) === String(curGid) && !msg.senderId);
 
                 return (
                   <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>

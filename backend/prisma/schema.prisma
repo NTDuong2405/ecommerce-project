@@ -106,6 +106,7 @@ model Product {
   createdAt   DateTime         @default(now())
   price       Float
   stock       Int              @default(0)
+  sizeChart   String?          // JSON string hoặc markdown bảng size (S: 40-50kg, M: 50-60kg...)
   variants    ProductVariant[]
   images      ProductImage[]
   cartItems   CartItem[]
@@ -115,9 +116,11 @@ model Product {
 model ProductVariant {
   id        Int    @id @default(autoincrement())
   productId Int
-  name      String // ví dụ: "M - Đỏ"
-  price     Float
-  stock     Int
+  name      String // Tên hiển thị chung, ví dụ "M - Đỏ"
+  size      String? // "S", "M", "L", "XL", "38", "39"...
+  color     String? // "Red", "Blue", "#FF0000"...
+  price     Float?  // Lưu giá riêng cho variant nếu khác giá gốc
+  stock     Int    @default(0)
   sku       String @unique
 
   product Product @relation(fields: [productId], references: [id])

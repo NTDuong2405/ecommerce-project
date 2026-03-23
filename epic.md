@@ -27,8 +27,13 @@ Tài liệu này tổng hợp toàn bộ các dòng chảy nghiệp vụ (Flows)
 
 ### C. Quản lý Kho & Vận hành Thông minh
 - **Sync Tồn kho Real-time**: Số lượng kho tự động cập nhật trên mọi thiết bị người dùng ngay khi có biến động (Nhập kho hoặc Bán ra) qua Socket.io.
-- **Excel Power Tools**: Hỗ trợ xuất mẫu Template Excel, Import sản phẩm hàng loạt và Export danh sách kho chỉ với một nút bấm.
+- **Excel Power Tools**: Hỗ trợ xuất mẫu Template Excel, Import sản phẩm hàng loạt (kèm Phân loại/Bảng size) và Export FULL dữ liệu hiện có để sao lưu/chỉnh sửa.
 - **Thanh toán Đa kênh**: Tích hợp VNPAY, MoMo, VietQR và thanh toán khi nhận hàng (COD).
+
+### E. Advanced Product Intelligence
+- **Visual Size Chart**: Hệ thống "Card cân nặng" trực quan. Khách hàng click vào mốc cân nặng để hệ thống tự động chọn Size phù hợp nhất.
+- **Detailed Variants**: Quản lý đa chiều (Size + Màu sắc + Kho riêng). Mỗi biến thể có mã SKU và số lượng tồn kho độc lập.
+- **Deep Selection Sync**: Tự động khôi phục lựa chọn Size/Màu khi khách hàng quay lại trang chi tiết từ Giỏ hàng qua URL thông minh.
 
 ### D. Trải nghiệm người dùng (UX) & Bảo mật
 - **Custom UI Validation**: Thay thế thông báo mặc định của trình duyệt bằng hệ thống khung đỏ rực rỡ (Tailwind CSS) và thông báo tiếng Việt tinh tế.
@@ -42,11 +47,15 @@ Tài liệu này tổng hợp toàn bộ các dòng chảy nghiệp vụ (Flows)
 - **US.C5**: Tôi muốn thấy rõ số tiền mình tiết kiệm được (giá cũ gạch ngang) ngay trong giỏ hàng để có động lực thanh toán.
 - **US.C6**: Tôi muốn nhận được quà tặng bất ngờ vào tháng sinh nhật của mình và sử dụng nó ngay tại bước thanh toán.
 - **US.C7**: Tôi muốn chat trực tiếp với cửa hàng khi có thắc mắc về kích cỡ sản phẩm mà không cần tải lại trang.
+- **US.C8**: Tôi muốn chọn Size/Màu sắc sản phẩm một cách mượt mà, và nếu tôi chọn Size qua "Card cân nặng", hệ thống phải tự động highlight và cập nhật trạng thái chọn.
+- **US.C9**: Khi tôi click vào sản phẩm từ Giỏ hàng để xem lại chi tiết, trang sản phẩm phải tự động chọn đúng Size/Màu mà tôi đã bỏ vào giỏ trước đó.
+- **US.C10**: Tôi muốn nhập mã đơn hàng và xem được trạng thái đơn hàng của mình (PENDING -> SHIPPING -> ...) một cách real-time.
 
 ### 👩‍💼 Đối với Admin/Staff
 - **US.A6**: Tôi muốn nhập hàng nghìn sản phẩm từ tệp Excel có sẵn để tiết kiệm thời gian vận hành.
 - **US.A7**: Tôi muốn biết ngay đơn hàng nào đã được thanh toán qua VNPAY/MoMo để tiến hành đóng gói mà không cần kiểm tra thủ công ngân hàng.
 - **US.A8**: Tôi muốn quản lý các chiến dịch Marketing cũ (Hết hạn) để phân tích hiệu quả kinh doanh.
+- **US.A9**: Tôi muốn xuất toàn bộ dữ liệu sản phẩm, đơn hàng, khách hàng ra file Excel để sao lưu hoặc chỉnh sửa hàng loạt.
 
 ---
 

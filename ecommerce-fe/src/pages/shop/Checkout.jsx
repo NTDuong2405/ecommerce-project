@@ -69,12 +69,15 @@ const Checkout = () => {
     }
   };
 
-  const handleApplyVoucher = async () => {
-    if (!coupon) return;
+  const handleApplyVoucher = async (codeOverride) => {
+    const codeToValidate = codeOverride || coupon;
+    if (!codeToValidate) return;
+
     setIsValidating(true);
     try {
-      const res = await api.post('/marketing/validate', { code: coupon.toUpperCase() });
+      const res = await api.post('/marketing/validate', { code: codeToValidate.toUpperCase() });
       setAppliedPromo(res.data.data);
+      if (codeOverride) setCoupon(codeOverride.toUpperCase());
     } catch (err) {
       setAppliedPromo(null);
       alert(err.response?.data?.message || 'Mã giảm giá không hợp lệ');
@@ -271,10 +274,17 @@ const Checkout = () => {
                 <ShoppingBag size={20} /> Review Your Items
               </h2>
               {items.map(item => (
-                <div key={item.productId} className="flex items-center gap-4 py-3 border-b border-slate-50 last:border-0">
+                <div key={item.cartKey} className="flex items-center gap-4 py-3 border-b border-slate-50 last:border-0">
                   <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-cover bg-slate-100 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-slate-900 truncate">{item.name}</div>
+                    <div className="font-semibold text-slate-900 truncate">
+                      {item.name}
+                      {(item.size || item.color) && (
+                        <span className="ml-2 text-[10px] text-slate-400 font-normal uppercase">
+                          ({[item.size, item.color].filter(Boolean).join(' / ')})
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-slate-400">
                       Qty: {item.quantity} × <span className="font-bold text-slate-900">{formatPrice(item.price)}</span>
                       {item.discountPercentage > 0 && (
@@ -393,17 +403,36 @@ const Checkout = () => {
             </div>
 
             {/* Voucher Section */}
-            <div className="mt-6 pt-6 border-t border-slate-100">
-              <button 
-                onClick={() => setShowVoucherModal(true)}
-                className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all border border-dashed border-slate-300 group"
+            <div className="mt-6 pt-6 border-t border-slate-100 space-y-3">
+              <div 
+                onClick={() => !appliedPromo && setShowVoucherModal(true)}
+                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all border border-dashed cursor-pointer group ${
+                  appliedPromo ? 'bg-primary-50 border-primary-300' : 'bg-slate-50 border-slate-300 hover:bg-slate-100'
+                }`}
               >
-                <div className="flex items-center gap-2 text-slate-600 group-hover:text-primary-600">
+                <div className={`flex items-center gap-2 ${appliedPromo ? 'text-primary-700' : 'text-slate-600 group-hover:text-primary-600'}`}>
                   <Ticket size={18} />
-                  <span className="font-medium">Chế độ Ưu đãi</span>
+                  <span className="font-bold">
+                    {appliedPromo ? `Voucher: ${appliedPromo.code}` : 'Chọn Voucher'}
+                  </span>
                 </div>
-                <ChevronRight size={16} className="text-slate-400" />
-              </button>
+                {appliedPromo ? (
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setAppliedPromo(null); setCoupon(''); }}
+                    className="p-1.5 hover:bg-primary-200 rounded-full text-primary-600 transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                ) : (
+                  <ChevronRight size={16} className="text-slate-400" />
+                )}
+              </div>
+              
+              {appliedPromo && (
+                <div className="bg-emerald-50 text-emerald-700 px-3 py-2 rounded-lg text-[10px] font-bold flex items-center gap-2 animate-fade-in-up">
+                  <CheckCircle size={12} /> Đã áp dụng giảm {appliedPromo.discount}% thành công!
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -428,7 +457,7 @@ const Checkout = () => {
                   vouchers.map(v => (
                     <button 
                       key={v.id}
-                      onClick={() => { setCoupon(v.code); setShowVoucherModal(false); handleApplyVoucher(); }}
+                      onClick={() => { setShowVoucherModal(false); handleApplyVoucher(v.code); }}
                       className="w-full text-left p-4 rounded-2xl border-2 border-slate-100 hover:border-primary-500 hover:bg-primary-50 transition-all group relative overflow-hidden"
                     >
                       <div className="flex justify-between items-start mb-1">

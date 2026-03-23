@@ -22,18 +22,23 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, quantity = 1) => {
     setItems(prev => {
-      const existing = prev.find(i => i.productId === product.id);
+      const cartKey = `${product.id}-${product.selectedSize || ''}-${product.selectedColor || ''}`;
+      const existing = prev.find(i => i.cartKey === cartKey);
+
       if (existing) {
         return prev.map(i =>
-          i.productId === product.id
+          i.cartKey === cartKey
             ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock) }
             : i
         );
       }
       return [...prev, {
+        cartKey,
         productId: product.id,
         name: product.name,
         price: product.price,
+        size: product.selectedSize,
+        color: product.selectedColor,
         originalPrice: product.originalPrice || product.price,
         discountPercentage: product.discountPercentage || 0,
         image: product.images?.[0]?.url || null,
@@ -43,16 +48,16 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (cartKey, quantity) => {
     if (quantity <= 0) {
-      removeItem(productId);
+      removeItem(cartKey);
       return;
     }
-    setItems(prev => prev.map(i => i.productId === productId ? { ...i, quantity } : i));
+    setItems(prev => prev.map(i => i.cartKey === cartKey ? { ...i, quantity } : i));
   };
 
-  const removeItem = (productId) => {
-    setItems(prev => prev.filter(i => i.productId !== productId));
+  const removeItem = (cartKey) => {
+    setItems(prev => prev.filter(i => i.cartKey !== cartKey));
   };
 
   const clearCart = () => setItems([]);

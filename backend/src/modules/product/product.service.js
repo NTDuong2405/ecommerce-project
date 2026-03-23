@@ -100,7 +100,8 @@ export const getList = async (query) => {
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
-        images: true
+        images: true,
+        variants: true
       }
     }),
     prisma.product.count({ where })
@@ -122,7 +123,8 @@ export const getDetail = async (id) => {
   const product = await prisma.product.findUnique({
     where: { id: Number(id) },
     include: {
-      images: true
+      images: true,
+      variants: true
     }
   });
 
@@ -135,47 +137,88 @@ export const create = async (data) => {
   return await prisma.product.create({
     data: {
       name: data.name,
-      description: data.description || '', // Default rỗng nếu không truyền
+      description: data.description || '',
+      category: data.category || 'General',
       price: Number(data.price),
       stock: data.stock ? Number(data.stock) : 0,
+      sizeChart: data.sizeChart || null,
       
-      // Nếu có mảng URLs ảnh gửi lên, tạo luôn record cho bảng ProductImage
       ...(data.images && data.images.length > 0 && {
         images: {
           create: data.images.map(imgUrl => ({ url: imgUrl }))
         }
+      }),
+
+      ...(data.variants && data.variants.length > 0 && {
+        variants: {
+          create: data.variants.map(v => ({
+            name: v.name || `${v.size || ''} - ${v.color || ''}`,
+            size: v.size,
+            color: v.color,
+            price: v.price ? Number(v.price) : null,
+            stock: Number(v.stock || 0),
+            sku: v.sku || `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
+          }))
+        }
       })
     },
     include: {
-      images: true // Trả về luôn thông tin ảnh vừa tạo
+      images: true,
+      variants: true
     }
   })
 }
 
 // ✅ [SERVICE] Xử lý nghiệp vụ Cập nhật Sản phẩm
 export const update = async (id, data) => {
+  console.log("Service update starting for ID:", id);
   // Xóa ảnh cũ nếu có truyền danh sách ảnh mới (đơn giản hóa logic cập nhật ảnh)
+  // Xóa ảnh cũ nếu update mảng ảnh mới
   if (data.images && data.images.length > 0) {
+    console.log("Deleting old images...");
     await prisma.productImage.deleteMany({ where: { productId: Number(id) } });
   }
+
+  // Xóa variants cũ để ghi đè (đơn giản hóa logic sync)
+  if (data.variants && data.variants.length > 0) {
+    console.log("Deleting old variants...");
+    await prisma.productVariant.deleteMany({ where: { productId: Number(id) } });
+  }
+  
+  console.log("Updating product with Prisma...");
 
   return await prisma.product.update({
     where: { id: Number(id) },
     data: {
       ...(data.name && { name: data.name }),
       ...(data.description !== undefined && { description: data.description }),
+      ...(data.category && { category: data.category }),
       ...(data.price && { price: Number(data.price) }),
       ...(data.stock !== undefined && { stock: Number(data.stock) }),
+      ...(data.sizeChart !== undefined && { sizeChart: data.sizeChart }),
       
-      // Tạo lại mảng ảnh mới sau khi đã xóa mảng cũ 
       ...(data.images && data.images.length > 0 && {
         images: {
           create: data.images.map(imgUrl => ({ url: imgUrl }))
         }
+      }),
+
+      ...(data.variants && data.variants.length > 0 && {
+        variants: {
+          create: data.variants.map(v => ({
+            name: v.name || `${v.size || ''} - ${v.color || ''}`,
+            size: v.size,
+            color: v.color,
+            price: v.price ? Number(v.price) : null,
+            stock: Number(v.stock || 0),
+            sku: v.sku || `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
+          }))
+        }
       })
     },
     include: {
-      images: true
+      images: true,
+      variants: true
     }
   })
 }
@@ -209,29 +252,59 @@ export const importProducts = async (data) => {
     const name = row.name || row.Name;
     const category = row.category || row.Category;
     const description = row.description || row.Description;
+    const sizeChart = row.sizeChart || row.SizeChart;
+
+    const variantData = row.variants || []; // Có thể là mảng nested JSON
+
+    const productPayload = {
+      ...(row.stock !== undefined && { stock: stock }),
+      ...(price && { price: price }),
+      ...(name && { name: name }),
+      ...(category && { category: category }),
+      ...(description !== undefined && { description: description }),
+      ...(sizeChart !== undefined && { sizeChart: sizeChart })
+    };
 
     if (productId && !isNaN(productId)) {
       // 1. Cập nhật sản phẩm hiện có
       await prisma.product.update({
         where: { id: productId },
         data: {
-          ...(row.stock !== undefined && { stock: stock }), // Cập nhật số lượng mới
-          ...(price && { price: price }),
-          ...(name && { name: name }),
-          ...(category && { category: category }),
-          ...(description !== undefined && { description: description })
+          ...productPayload,
+          ...(variantData.length > 0 && {
+            variants: {
+              deleteMany: {},
+              create: variantData.map(v => ({
+                name: v.name || `${v.size || ''} - ${v.color || ''}`,
+                size: v.size?.toString(),
+                color: v.color?.toString(),
+                price: v.price ? Number(v.price) : null,
+                stock: Number(v.stock || 0),
+                sku: v.sku || `IMPORT-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
+              }))
+            }
+          })
         }
       });
       count++;
     } else if (name) {
-      // 2. Tạo sản phẩm mới hoàn toàn
+      // 2. Tạo mới hoàn toàn
       await prisma.product.create({
         data: {
-          name: name,
+          ...productPayload,
           category: category || 'General',
-          price: price || 0,
-          stock: stock || 0,
-          description: description || ''
+          ...(variantData.length > 0 && {
+            variants: {
+              create: variantData.map(v => ({
+                name: v.name || `${v.size || ''} - ${v.color || ''}`,
+                size: v.size?.toString(),
+                color: v.color?.toString(),
+                price: v.price ? Number(v.price) : null,
+                stock: Number(v.stock || 0),
+                sku: v.sku || `IMPORT-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
+              }))
+            }
+          })
         }
       });
       count++;
@@ -240,15 +313,12 @@ export const importProducts = async (data) => {
   return { count };
 }
 
-// ✅ [SERVICE] [EXPORT TEMPLATE] Lấy dữ liệu sản phẩm để làm mẫu Excel
+// ✅ [SERVICE] [EXPORT TEMPLATE] Lấy toàn bộ dữ liệu sản phẩm để làm mẫu Excel hoặc sao lưu
 export const getExportTemplateData = async () => {
   const products = await prisma.product.findMany({
-    select: {
-      id: true,
-      name: true,
-      category: true,
-      price: true,
-      stock: true
+    include: {
+      images: true,
+      variants: true
     },
     orderBy: { id: 'asc' }
   });
@@ -257,12 +327,32 @@ export const getExportTemplateData = async () => {
     // Nếu chưa có SP nào, trả về 1 dòng ví dụ
     return [{
       id: '',
-      name: 'Nike Air Force 1 (Ví dụ)',
-      category: 'Shoes',
-      price: 1500000,
-      stock: 50
+      name: 'Áo Vibe (Ví dụ)',
+      description: 'Mô tả sản phẩm mẫu của bạn...',
+      category: 'Fashion',
+      price: 250000,
+      stock: 100,
+      images: 'https://example.com/image1.jpg, https://example.com/image2.jpg',
+      sizeChart: '{"S":"40-50kg","M":"50-60kg"}',
+      variants: '[{"size":"S","color":"Trắng","stock":50},{"size":"M","color":"Đen","stock":50}]'
     }];
   }
   
-  return products;
+  // Format lại để xuất ra Excel (làm dẹt mảng con)
+  return products.map(p => ({
+    id: p.id,
+    name: p.name,
+    description: p.description || '',
+    category: p.category || 'General',
+    price: p.price,
+    stock: p.stock,
+    sizeChart: p.sizeChart || '',
+    images: p.images.map(img => img.url).join(', '),
+    variants: p.variants.length > 0 ? JSON.stringify(p.variants.map(v => ({
+       size: v.size,
+       color: v.color,
+       stock: v.stock,
+       sku: v.sku
+    }))) : ''
+  }));
 }

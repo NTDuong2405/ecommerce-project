@@ -63,23 +63,27 @@ export const getAdminStats = async () => {
     })
   ]);
 
-  // Lấy tên sản phẩm cho topProducts
-  const topProducts = await Promise.all(topProductsRaw.map(async (item) => {
-    const product = await prisma.product.findUnique({
-      where: { id: item.productId },
-      select: { 
-        name: true, 
-        price: true, 
-        images: { take: 1, select: { url: true } } 
-      }
-    });
+  // 1. Lấy thông tin chi tiết sản phẩm cho topProducts (Optimized: 1 query instead of N queries)
+  const productIds = topProductsRaw.map(item => item.productId);
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+    select: { 
+      id: true,
+      name: true, 
+      price: true, 
+      images: { take: 1, select: { url: true } } 
+    }
+  });
+
+  const topProducts = topProductsRaw.map(item => {
+    const product = products.find(p => p.id === item.productId);
     return {
       name: product?.name || 'Unknown',
       sales: item._sum.quantity,
       revenue: (product?.price || 0) * item._sum.quantity,
       image: product?.images?.[0]?.url || null
     };
-  }));
+  });
 
   // ... (giữ nguyên logic chartDataMap và formattedRecentOrders) ...
   const chartDataMap = {};

@@ -85,24 +85,46 @@ const AdminCustomers = () => {
   useEffect(() => {
     if (socket) {
       const handleGlobalChatMsg = (msg) => {
-        // Cập nhật số lượng chat hoặc refresh list
-        fetchCustomers();
-        
         const senderId = msg.senderId || msg.guestId;
         const isFromCustomer = String(msg.senderId) !== "1";
 
-        // Nếu đang mở chat với đúng người đó, cập nhật tin nhắn
+        // Logic 1: Cập nhật tăng số lượng chatMessages trong state customers cục bộ nếu khách hàng đang đứng ở trang này
+        setCustomers(prevList => prevList.map(c => {
+          const cid = c.id || c.guestId;
+          if (String(cid) === String(senderId)) {
+            return {
+              ...c,
+              _count: {
+                ...c._count,
+                chatMessages: (c._count?.chatMessages || 0) + 1
+              }
+            };
+          }
+          return c;
+        }));
+
+        // Logic 2: Nếu chưa có trong danh sách hiện tại (ví dụ khách mới toanh), có thể fetch lại tùy điều kiện
+        // Nhưng để tối ưu, ta không fetch lại toàn bộ danh sách ở đây trừ khi cần thiết. 
+        // (Đã có logic fetch định kỳ ở các sự kiện khác hoặc qua Notification bell)
+
+        // Logic 3: Nếu đang mở chat, cập nhật tin nhắn vào khung chat
         if (activeModal === 'CHAT' && selectedUser) {
           const myId = selectedUser.id || selectedUser.guestId;
-          const isRelated = String(senderId) === String(myId);
+          const isRelated = 
+            (String(msg.senderId) === String(myId) || String(msg.guestId) === String(myId)) || 
+            (String(msg.senderId) === "1" && (String(msg.receiverId) === String(myId) || String(msg.guestId) === String(myId)));
           
           if (isRelated) {
-            setChats(prev => [...prev, msg]);
-            return; // Đã xem rồi thì không cần báo đỏ
+            setChats(prev => {
+              const exists = prev.some(m => m.id && msg.id && String(m.id) === String(msg.id));
+              if (exists) return prev;
+              return [...prev, msg];
+            });
+            return;
           }
         }
 
-        // Nếu tin nhắn mới từ khách và mình chưa mở chat với họ -> Báo đỏ
+        // Nếu tin nhắn mới từ khách và mình chưa mở chat với họ -> Báo đỏ (Unread)
         if (isFromCustomer) {
           setUnreadMap(prev => ({
             ...prev,
