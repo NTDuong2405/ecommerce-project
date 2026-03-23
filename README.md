@@ -97,9 +97,27 @@ docker-compose up --build -d
 * Bạn có thể nhấn vào từng cái để xem **Logs** (Nhật ký hoạt động) rất dễ dàng.
 
 ### 4. Truy cập hệ thống
-* **Trang chủ (Shop):** [http://localhost:3001](http://localhost:3001)
-* **Trang Admin:** [http://localhost:3001/admin](http://localhost:3001/admin)
-* **API Backend:** [http://localhost:3000](http://localhost:3000)
+---
+
+## 🔥 PRODUCTION (BẢN CHÍNH THỨC)
+
+Hệ thống đã được tối ưu hóa và triển khai trực tuyến với dữ liệu thật (Seeded Prod):
+
+*   **🌐 Trang chủ (Shop):** [https://ecommerce-project-m3o1.vercel.app/](https://ecommerce-project-m3o1.vercel.app/)
+*   **⚙️ Trang Admin (Quản trị):** [https://ecommerce-project-m3o1.vercel.app/admin](https://ecommerce-project-m3o1.vercel.app/admin)
+*   **📦 Database Cloud:** Supabase (PostgreSQL 16) - Đã đồng bộ 53 sản phẩm cao cấp.
+
+---
+
+## 🚀 Khởi động nhanh (Local Development)
+
+Dưới đây là các đường dẫn truy cập khi bạn chạy bằng **npm start** hoặc **Docker**:
+
+*   **🛒 Trang chủ (Local):** [http://localhost:3001](http://localhost:3001)
+*   **🛠️ Trang Admin (Local):** [http://localhost:3001/admin](http://localhost:3001/admin)
+*   **📡 API Backend:** [http://localhost:3000](http://localhost:3000)
+
+---
 
 ### 5. Dừng hệ thống
 Khi muốn tắt dự án, chạy lệnh: `docker-compose down`
