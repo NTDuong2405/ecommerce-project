@@ -5,6 +5,7 @@ import { useSocket } from '../../context/SocketContext';
 import { useSearchParams } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
 import { toast } from 'react-hot-toast';
+import CustomSelect from '../../components/ui/CustomSelect';
 
 const AdminCustomers = () => {
   const [searchParams] = useSearchParams();
@@ -502,17 +503,19 @@ const AdminCustomers = () => {
             </div>
             
             <form onSubmit={handleSendNotify} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Notice Type</label>
-                <select 
-                  className="w-full border border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 bg-white"
+              {/* Loại thông báo xịn xò */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Loại thông báo</label>
+                <CustomSelect 
+                  options={[
+                    { value: 'PROMO', label: 'Khuyến mãi / Voucher' },
+                    { value: 'INFO', label: 'Thông tin cá nhân' },
+                    { value: 'URGENT', label: 'Khẩn cấp / Hệ thống' }
+                  ]}
                   value={notifyData.type}
-                  onChange={(e) => setNotifyData({...notifyData, type: e.target.value})}
-                >
-                  <option value="PROMO">Promotion / Discount</option>
-                  <option value="BIRTHDAY">Happy Birthday</option>
-                  <option value="SYSTEM">System Alert</option>
-                </select>
+                  onChange={(val) => setNotifyData({...notifyData, type: val})}
+                  icon={Send}
+                />
               </div>
 
               <div>

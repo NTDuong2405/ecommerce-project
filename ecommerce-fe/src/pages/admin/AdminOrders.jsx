@@ -3,10 +3,12 @@ import api from '../../utils/api';
 import { Search, Eye, Filter, CheckCircle, Package, Truck, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
+import CustomSelect from '../../components/ui/CustomSelect';
 
 const AdminOrders = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('orderId') || '');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -40,7 +42,7 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/orders/all?page=${page}&limit=10&search=${searchTerm}`);
+      const res = await api.get(`/orders/all?page=${page}&limit=10&search=${searchTerm}&status=${statusFilter}`);
       setOrders(res.data?.data?.data || res.data?.data || []);
       setMeta(res.data?.data?.meta || null);
     } catch (err) {
@@ -52,7 +54,7 @@ const AdminOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [page, searchTerm]);
+  }, [page, searchTerm, statusFilter]);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -97,13 +99,31 @@ const AdminOrders = () => {
           />
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <select className="border border-slate-200 text-slate-600 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white">
-            <option value="">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="SHIPPING">Shipping</option>
-            <option value="DELIVERED">Delivered</option>
-          </select>
+          <div className="w-full sm:w-[180px]">
+            <CustomSelect 
+              options={[
+                { value: '', label: 'All Statuses' },
+                { value: 'PENDING', label: 'Pending' },
+                { value: 'CONFIRMED', label: 'Confirmed' },
+                { value: 'SHIPPING', label: 'Shipping' },
+                { value: 'DELIVERED', label: 'Delivered' },
+                { value: 'CANCELLED', label: 'Cancelled' }
+              ]}
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setPage(1); // Reset to first page on filter change
+                const newSearchParams = new URLSearchParams(searchParams);
+                if (val) {
+                  newSearchParams.set('status', val);
+                } else {
+                  newSearchParams.delete('status');
+                }
+                setSearchParams(newSearchParams);
+              }}
+              icon={Filter}
+            />
+          </div>
           <button className="flex items-center justify-center gap-2 text-slate-600 border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-lg font-medium transition-colors">
             <Filter size={18} />
             <span className="hidden sm:inline">Filters</span>
@@ -151,22 +171,23 @@ const AdminOrders = () => {
                     <td className="px-6 py-4 font-black text-slate-900 text-base">
                       {order.totalPrice.toLocaleString()}đ
                     </td>
-                    <td className="px-6 py-4">
-                      {getStatusBadge(order.status)}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="w-[140px]">
+                        <CustomSelect 
+                          options={[
+                            { value: 'PENDING', label: 'Pending' },
+                            { value: 'CONFIRMED', label: 'Confirmed' },
+                            { value: 'SHIPPING', label: 'Shipping' },
+                            { value: 'DELIVERED', label: 'Delivered' },
+                            { value: 'CANCELLED', label: 'Cancelled' }
+                          ]}
+                          value={order.status}
+                          onChange={(val) => handleStatusChange(order.id, val)}
+                        />
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-3 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                        <select 
-                          value={order.status}
-                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                          className="bg-white border border-slate-200 text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl focus:ring-2 focus:ring-primary-500 transition-all shadow-sm outline-none"
-                        >
-                          <option value="PENDING">Pending</option>
-                          <option value="CONFIRMED">Confirmed</option>
-                          <option value="SHIPPING">Shipping</option>
-                          <option value="DELIVERED">Delivered</option>
-                          <option value="CANCELLED">Cancelled</option>
-                        </select>
                         <button 
                           onClick={() => setSelectedOrder(order)}
                           className="p-2.5 bg-primary-600 text-white rounded-xl shadow-lg shadow-primary-600/20 hover:bg-primary-700 transition-all"
@@ -226,17 +247,19 @@ const AdminOrders = () => {
                     <Eye size={14} /> Chi tiết
                   </button>
                   <div className="flex-1 relative">
-                    <select 
+                    <CustomSelect 
+                      options={[
+                        { value: 'PENDING', label: 'Pending', icon: Package },
+                        { value: 'CONFIRMED', label: 'Confirmed', icon: CheckCircle },
+                        { value: 'SHIPPING', label: 'Shipping', icon: Truck },
+                        { value: 'DELIVERED', label: 'Delivered', icon: CheckCircle },
+                        { value: 'CANCELLED', label: 'Cancelled', icon: XCircle }
+                      ]}
                       value={order.status}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                      className="w-full bg-white border-2 border-slate-100 text-[10px] font-black uppercase tracking-widest px-4 py-3 rounded-xl appearance-none outline-none focus:border-primary-500 transition-colors"
-                    >
-                      <option value="PENDING">Status</option>
-                      <option value="CONFIRMED">Firmed</option>
-                      <option value="SHIPPING">Ship</option>
-                      <option value="DELIVERED">Done</option>
-                      <option value="CANCELLED">Exit</option>
-                    </select>
+                      onChange={(val) => handleStatusChange(order.id, val)}
+                      placeholder="Status"
+                      className="w-full"
+                    />
                   </div>
                 </div>
               </div>
@@ -392,20 +415,21 @@ const AdminOrders = () => {
                     <div className="space-y-3">
                       <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Update Status</p>
                       <div className="relative group">
-                        <select 
+                        <CustomSelect 
+                          options={[
+                            { value: 'PENDING', label: 'Pending' },
+                            { value: 'CONFIRMED', label: 'Confirmed' },
+                            { value: 'SHIPPING', label: 'Shipping' },
+                            { value: 'DELIVERED', label: 'Delivered' },
+                            { value: 'CANCELLED', label: 'Cancelled' }
+                          ]}
                           value={selectedOrder.status}
-                          onChange={(e) => {
-                            handleStatusChange(selectedOrder.id, e.target.value);
-                            setSelectedOrder({...selectedOrder, status: e.target.value});
+                          onChange={(val) => {
+                            handleStatusChange(selectedOrder.id, val);
+                            setSelectedOrder({...selectedOrder, status: val});
                           }}
                           className="w-full bg-slate-800 border-2 border-slate-700 text-white px-4 py-3 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm font-black uppercase tracking-widest italic cursor-pointer appearance-none"
-                        >
-                          <option value="PENDING">Pending</option>
-                          <option value="CONFIRMED">Confirmed</option>
-                          <option value="SHIPPING">Shipping</option>
-                          <option value="DELIVERED">Delivered</option>
-                          <option value="CANCELLED">Cancelled</option>
-                        </select>
+                        />
                       </div>
                       <p className="text-[10px] text-slate-500 font-bold leading-tight opacity-60 italic">
                         Cập nhật trạng thái này sẽ đồng bộ hóa ngay lập tức.

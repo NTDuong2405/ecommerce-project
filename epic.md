@@ -34,6 +34,7 @@ Tài liệu này tổng hợp toàn bộ các dòng chảy nghiệp vụ (Flows)
 - **Visual Size Chart**: Hệ thống "Card cân nặng" trực quan. Khách hàng click vào mốc cân nặng để hệ thống tự động chọn Size phù hợp nhất.
 - **Detailed Variants**: Quản lý đa chiều (Size + Màu sắc + Kho riêng). Mỗi biến thể có mã SKU và số lượng tồn kho độc lập.
 - **Deep Selection Sync**: Tự động khôi phục lựa chọn Size/Màu khi khách hàng quay lại trang chi tiết từ Giỏ hàng qua URL thông minh.
+- **Advanced Navigation**: Hệ thống Mega Menu 2-3 tầng (Main Category -> Sub-category -> Product Preview). Tự động đồng bộ hóa URL để khách hàng có thể bộ lọc sâu (vd: Fashion -> Pants) và chia sẻ link kết quả lọc trực tiếp.
 
 ### D. Trải nghiệm người dùng (UX) & Bảo mật
 - **Custom UI Validation**: Thay thế thông báo mặc định của trình duyệt bằng hệ thống khung đỏ rực rỡ (Tailwind CSS) và thông báo tiếng Việt tinh tế.
@@ -50,6 +51,7 @@ Tài liệu này tổng hợp toàn bộ các dòng chảy nghiệp vụ (Flows)
 - **US.C8**: Tôi muốn chọn Size/Màu sắc sản phẩm một cách mượt mà, và nếu tôi chọn Size qua "Card cân nặng", hệ thống phải tự động highlight và cập nhật trạng thái chọn.
 - **US.C9**: Khi tôi click vào sản phẩm từ Giỏ hàng để xem lại chi tiết, trang sản phẩm phải tự động chọn đúng Size/Màu mà tôi đã bỏ vào giỏ trước đó.
 - **US.C10**: Tôi muốn nhập mã đơn hàng và xem được trạng thái đơn hàng của mình (PENDING -> SHIPPING -> ...) một cách real-time.
+- **US.C11**: Tôi muốn duyệt sản phẩm theo các lớp danh mục sâu hơn (vd: trong Thời trang có Quần, Áo, Áo Dài) trực tiếp từ thanh menu để tìm nhanh thứ mình cần.
 
 ### 👩‍💼 Đối với Admin/Staff
 - **US.A6**: Tôi muốn nhập hàng nghìn sản phẩm từ tệp Excel có sẵn để tiết kiệm thời gian vận hành.

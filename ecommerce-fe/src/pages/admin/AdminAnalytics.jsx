@@ -4,6 +4,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line 
 } from 'recharts';
 import { TrendingUp, Users, ShoppingBag, PieChart as ChartPieIcon, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import CustomSelect from '../../components/ui/CustomSelect';
 
 const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -47,16 +48,18 @@ const AdminAnalytics = () => {
           </h2>
           <p className="text-slate-500 mt-1">Phân tích dữ liệu kinh doanh chuyên sâu dành riêng cho Admin.</p>
         </div>
-        <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-          <Calendar size={18} className="text-slate-400 ml-2" />
-          <select 
-            className="bg-transparent border-none focus:ring-0 font-bold text-slate-700 outline-none"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          >
-            <option value="2026">Năm 2026</option>
-            <option value="2025">Năm 2025</option>
-          </select>
+        <div className="w-[180px]">
+          <CustomSelect 
+            options={[
+              { value: 2026, label: 'Năm 2026' },
+              { value: 2025, label: 'Năm 2025' },
+              { value: 2024, label: 'Năm 2024' }, // Added current year for selection
+              { value: 2023, label: 'Năm 2023' },
+            ]}
+            value={Number(year)}
+            onChange={(val) => setYear(val)}
+            icon={Calendar}
+          />
         </div>
       </div>
 

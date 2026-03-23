@@ -3,6 +3,7 @@ import api from '../../utils/api';
 import { Plus, Search, Edit2, Trash2, Filter, X, AlertTriangle, CheckCircle, Package, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 import Pagination from '../../components/Pagination';
+import CustomSelect from '../../components/ui/CustomSelect';
 
 const AdminProducts = () => {
   // --- STATES ---
@@ -11,6 +12,8 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [categories] = useState(['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home', 'General']);
   const { socket } = useSocket();
 
   // States quản lý Modal Thêm/Sửa sản phẩm
@@ -39,7 +42,13 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/products?search=${searchTerm}&page=${page}&limit=10`);
+      const params = new URLSearchParams({ 
+        search: searchTerm, 
+        page, 
+        limit: 10,
+        ...(selectedCategory && { category: selectedCategory })
+      });
+      const res = await api.get(`/products?${params.toString()}`);
       setProducts(res.data?.data?.data || res.data?.data || []);
       setMeta(res.data?.data?.meta || null);
     } catch (err) {
@@ -51,7 +60,7 @@ const AdminProducts = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm, page]);
+  }, [searchTerm, page, selectedCategory]);
 
   useEffect(() => {
     // --- Tích hợp Socket.io Real-time tập trung ---
@@ -231,13 +240,24 @@ const AdminProducts = () => {
           <p className="text-slate-500 text-sm mt-1">Manage your catalog, inventory, and variants.</p>
         </div>
         <div className="flex gap-3">
-          <button 
-            onClick={handleExportExcel}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 transition-all shadow-sm"
-          >
-            <Download size={18} />
-            <span>Export ALL</span>
-          </button>
+            {/* Bộ lọc theo Category xịn xò */}
+            <div className="w-[180px]">
+              <CustomSelect 
+                options={[{ value: '', label: 'All Categories' }, ...categories.map(c => ({ value: c, label: c }))]}
+                value={selectedCategory}
+                onChange={(val) => { setSelectedCategory(val); setPage(1); }}
+                icon={Filter}
+              />
+            </div>
+
+            <button 
+              onClick={handleExportExcel}
+              className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-slate-600 font-bold text-sm"
+              title="Export to Excel"
+            >
+              <Download size={18} />
+              <span className="hidden lg:inline">Export Excel</span>
+            </button>
           <label className={`cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm border ${importing ? 'bg-slate-50 text-slate-400' : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'}`}>
             <Package size={18} />
             <span>{importing ? 'Importing...' : 'Import Excel'}</span>
@@ -449,14 +469,14 @@ const AdminProducts = () => {
                 </div>
               </div>
 
+              {/* Category Dropdown xịn xò */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1 text-xs uppercase tracking-wider">Size Chart (JSON - vd: {"{\"S\": \"40-50kg\"}"})</label>
-                <textarea 
-                  rows={2}
-                  placeholder='{"S": "40-50kg", "M": "50-60kg"}'
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono text-xs"
-                  value={currentProduct.sizeChart}
-                  onChange={e => setCurrentProduct({...currentProduct, sizeChart: e.target.value})}
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Category</label>
+                <CustomSelect 
+                  options={categories}
+                  value={currentProduct.category}
+                  onChange={(val) => setCurrentProduct({ ...currentProduct, category: val })}
+                  icon={Package}
                 />
               </div>
 

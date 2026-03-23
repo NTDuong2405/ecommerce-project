@@ -89,6 +89,14 @@ export const getList = async (query) => {
 
       Object.keys(priceFilter).length
         ? { price: priceFilter }
+        : undefined,
+      
+      query.category
+        ? { category: { equals: query.category, mode: 'insensitive' } }
+        : undefined,
+
+      query.subCategory
+        ? { subCategory: { equals: query.subCategory, mode: 'insensitive' } }
         : undefined
     ].filter(Boolean)
   }

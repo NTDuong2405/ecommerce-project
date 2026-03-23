@@ -17,6 +17,17 @@ const Products = () => {
   const [total, setTotal] = useState(0);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
+  const [selectedSubCategory, setSelectedSubCategory] = useState(searchParams.get('subCategory') || '');
+  const [categories] = useState(['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home']);
+
+  const subCategoryMap = {
+    Fashion: ['Áo Dài', 'Streetwear', 'Pants', 'T-Shirt', 'Polo'],
+    Tech: ['Smartphone', 'Audio', 'Laptop', 'Smart Home'],
+    Accessories: ['Watch', 'Bag', 'Jewelry'],
+    Beauty: ['Skincare', 'Makeup', 'Body Care'],
+    Home: ['Pottery/Basket', 'Vase', 'Furniture', 'Decoration']
+  };
   const sortParam = searchParams.get('sort');
   const limit = 8;
 
@@ -27,6 +38,8 @@ const Products = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
+      if (selectedCategory) params.append('category', selectedCategory);
+      if (selectedSubCategory) params.append('subCategory', selectedSubCategory);
       
       // Hỗ trợ New Arrivals: Sắp xếp theo ngày tạo mới nhất
       if (sortParam === 'newest') {
@@ -44,14 +57,37 @@ const Products = () => {
     }
   };
 
+  // Sync with URL params
+  useEffect(() => {
+    const cat = searchParams.get('category') || '';
+    const subCat = searchParams.get('subCategory') || '';
+    
+    if (cat !== selectedCategory || subCat !== selectedSubCategory) {
+      setSelectedCategory(cat);
+      setSelectedSubCategory(subCat);
+      setPage(1);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     fetchProducts();
-  }, [page, searchTerm, minPrice, maxPrice, sortParam]);
+  }, [page, searchTerm, minPrice, maxPrice, sortParam, selectedCategory, selectedSubCategory]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
     setSearchTerm(searchInput);
+  };
+
+  const updateCategory = (cat) => {
+    setSelectedCategory(cat);
+    setSelectedSubCategory(''); // Reset sub on main cat change
+    setPage(1);
+    const newParams = new URLSearchParams(searchParams);
+    if (cat) newParams.set('category', cat);
+    else newParams.delete('category');
+    newParams.delete('subCategory');
+    setSearchParams(newParams);
   };
 
   const totalPages = Math.ceil(total / limit);
@@ -64,6 +100,33 @@ const Products = () => {
           Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600">Collection</span>
         </h1>
         <p className="text-slate-500 text-lg">Discover {total} premium products handpicked for you.</p>
+
+        {/* Category Chips */}
+        <div className="flex flex-wrap items-center gap-2 mt-8">
+          <button
+            onClick={() => updateCategory('')}
+            className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+              !selectedCategory 
+                ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' 
+                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            All Products
+          </button>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => updateCategory(cat)}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                selectedCategory === cat 
+                  ? 'bg-primary-600 text-white shadow-lg shadow-primary-100' 
+                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Filters Bar */}

@@ -103,6 +103,7 @@ model Product {
   name        String
   description String?
   category    String?
+  subCategory String?
   createdAt   DateTime         @default(now())
   price       Float
   stock       Int              @default(0)
