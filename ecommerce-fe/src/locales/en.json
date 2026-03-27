@@ -30,6 +30,37 @@
       "title": "Trending Now",
       "desc": "Our currently most popular items that everyone loves.",
       "view_all": "View All"
+    },
+    "collections": {
+      "title": "Shop by Collection",
+      "desc": "Browse our curated selection of high-end essentials.",
+      "Clothing": "Apparel & Streetwear",
+      "Shoes": "Footwear Excellence",
+      "Bags": "Luxury Carry-ons",
+      "Accessories": "Signature Details",
+      "Tech": "Modern Electronics"
+    },
+    "about": {
+      "title": "Our Craftsmanship",
+      "desc": "Founded in 2026, VibeCart represents the fusion of minimalist design and high-performance quality. We source every material with precision to ensure your absolute comfort.",
+      "cta": "Read Our Story"
+    },
+    "newsletter": {
+      "title": "Stay in the Vibe",
+      "desc": "Sign up for early access to new collections and exclusive discounts.",
+      "placeholder": "Email Address",
+      "subscribe": "Join Now",
+      "success": "Welcome to the family! 🚀"
+    },
+    "testimonials": {
+      "title": "What Our Community Says",
+      "t1": "The quality is simply unmatched. Every piece feels like it was made with such care and precision.",
+      "t2": "Fast shipping and the packaging was beautiful. Truly a premium experience from start to finish.",
+      "t3": "VibeCart has become my go-to for all my tech and fashion needs. Minimalist and sleek."
+    },
+    "social": {
+      "title": "Follow the Vibe",
+      "handle": "@vibecart_official"
     }
   },
   "product": {

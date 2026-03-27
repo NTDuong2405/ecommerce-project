@@ -12,8 +12,8 @@
   "home": {
     "hero": {
       "badge": "Bộ sưu tập Mới 2026 đã sẵn sàng",
-      "title": "Chất Lượng Thật - Không Cần ",
-      "title_span": "Đánh Đổi",
+      "title": "Đẳng Cấp Tối Giản - ",
+      "title_span": "Chất Lượng Vượt Trội",
       "desc": "Nâng tầm phong cách sống với bộ sưu tập CAO CẤP được tuyển chọn kỹ lưỡng. Miễn phí vận chuyển toàn cầu cho đơn hàng trên 3.750.000đ.",
       "cta_shop": "Mua Ngay",
       "cta_explore": "Khám Phá"
@@ -30,6 +30,37 @@
       "title": "Xu Hướng",
       "desc": "Những sản phẩm thịnh hành nhất được mọi người săn đón.",
       "view_all": "Xem Tất Cả"
+    },
+    "collections": {
+      "title": "Mua sắm theo Bộ sưu tập",
+      "desc": "Khám phá các dòng sản phẩm cao cấp được tuyển chọn kỹ lưỡng.",
+      "Clothing": "Thời trang & Streetwear",
+      "Shoes": "Giày Dép Cao Cấp",
+      "Bags": "Túi Xách Sang Trọng",
+      "Accessories": "Phụ Kiện Tinh Tế",
+      "Tech": "Công Nghệ Hiện Đại"
+    },
+    "about": {
+      "title": "Sứ mệnh của chúng tôi",
+      "desc": "Được thành lập vào năm 2026, VibeCart đại diện cho sự kết hợp giữa thiết kế tối giản và chất lượng vượt trội. Chúng tôi lựa chọn từng chất liệu một cách tỉ mỉ để đảm bảo sự thoải mái tuyệt đối cho bạn.",
+      "cta": "Câu Chuyện Thương Hiệu"
+    },
+    "newsletter": {
+      "title": "Tham gia cộng đồng Vibe",
+      "desc": "Đăng ký để nhận thông báo sớm về các bộ sưu tập mới và ưu đãi độc quyền.",
+      "placeholder": "Địa chỉ Email",
+      "subscribe": "Tham gia ngay",
+      "success": "Chào mừng bạn gia nhập gia đình VibeCart! 🚀"
+    },
+    "testimonials": {
+      "title": "Cộng đồng nói về VibeCart",
+      "t1": "Chất lượng thực sự vượt mong đợi. Từng sản phẩm đều mang lại cảm giác cao cấp và tỉ mỉ.",
+      "t2": "Giao hàng nhanh và đóng gói rất đẹp. Một trải nghiệm mua sắm thực sự sang trọng.",
+      "t3": "VibeCart là lựa chọn hàng đầu của tôi mỗi khi cần mua đồ công nghệ hay thời trang tối giản."
+    },
+    "social": {
+      "title": "Theo dõi phong cách Vibe",
+      "handle": "@vibecart_official"
     }
   },
   "product": {
