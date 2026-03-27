@@ -49,6 +49,9 @@ async function main() {
       { name: 'Off-White Hoodie', cat: 'Clothing', sub: 'Streetwear', price: 550, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80' },
       { name: 'Levi 501 Original', cat: 'Clothing', sub: 'Pants', price: 80, img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&q=80' },
       { name: 'Polo Ralph Lauren', cat: 'Clothing', sub: 'Polo', price: 120, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&q=80' },
+      { name: 'iPhone 16 Pro Max', cat: 'Tech', sub: 'Smartphone', price: 1200, img: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&q=80' },
+      { name: 'MacBook Pro M3', cat: 'Tech', sub: 'Laptop', price: 2500, img: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80' },
+      { name: 'Sony WH-1000XM5', cat: 'Tech', sub: 'Audio', price: 350, img: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=500&q=80' },
     ];
 
     const products = [];
