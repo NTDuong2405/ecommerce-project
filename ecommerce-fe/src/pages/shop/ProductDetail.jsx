@@ -132,7 +132,7 @@ const ProductDetail = () => {
 
   const images = product.images?.length > 0
     ? product.images.map(img => img.url)
-    : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'];
+    : ['https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&w=800&q=80'];
 
   const inStock = product.stock > 0;
 

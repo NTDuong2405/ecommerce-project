@@ -78,7 +78,7 @@ export const getList = async (query) => {
     AND: [
       keywords.length
         ? {
-            OR: keywords.map((word) => ({
+            AND: keywords.map((word) => ({
               name: {
                 contains: word,
                 mode: 'insensitive'

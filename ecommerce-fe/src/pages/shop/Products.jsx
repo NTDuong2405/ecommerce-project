@@ -6,7 +6,7 @@ import { formatPrice } from '../../utils/format';
 import { useTranslation } from 'react-i18next';
 
 
-const CATEGORIES = ['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home'];
+const CATEGORIES = ['Clothing', 'Shoes', 'Bags', 'Accessories', 'Tech'];
 
 const Products = () => {
   const { t } = useTranslation();
@@ -233,7 +233,7 @@ const Products = () => {
 /* ─── Product Card Component ─── */
 const ProductCard = ({ product }) => {
   const { t } = useTranslation();
-  const image = product.images?.[0]?.url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80';
+  const image = product.images?.length > 0 ? product.images[0].url : 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&w=800&q=80';
 
   return (
     <Link
