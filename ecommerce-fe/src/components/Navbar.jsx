@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Search, User, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import api from '../utils/api';
