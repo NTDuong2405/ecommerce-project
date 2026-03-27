@@ -1,46 +1,47 @@
 # 🧪 VibeCart - Master Test Case Documentation
 
-Tài liệu này dùng để kiểm duyệt (QA/QC) toàn bộ luồng nghiệp vụ của dự án VibeCart.
+Tài liệu này dùng để kiểm duyệt (QA/QC) toàn bộ luồng nghiệp vụ của dự án VibeCart phiên bản 3.0.
 
 ---
 
-## 🛒 1. Customer Shopping Flow (Luồng khách hàng)
+## 🛒 1. Customer Shopping Flow (Khách hàng)
 
-| ID | Test Case | Expected Result (Kết quả kỳ vọng) | Status |
-| :--- | :--- | :--- | :---: |
-| **TC.C1** | Kiểm tra Responsive Trang chủ | Hiển thị Banner Hero, Features và Sản phẩm Trending mượt mà trên Mobile/Tablet. | [⚠️] |
-| **TC.C2** | Chuyển đổi Ngôn ngữ (Switch VN/EN) | Sau khi click đổi tiếng, Header, Footer và TOÀN BỘ GIÁ SẢN PHẨM phải cập nhật đúng ngôn ngữ/tỉ giá. | [⚠️] |
-| **TC.C3** | Tỉ giá Động (Dynamic Rate) | Khi truy cập, tỉ giá VND/USD phải khớp với thị trường thực tế (không phải cứng 25.000đ). | [✅] |
-| **TC.C4** | Thêm sản phẩm vào Giỏ hàng | Clicking "Add to Cart" hiển thị Toast thông báo và Badge ở giỏ hàng tăng số lượng tức thì. | [✅] |
-| **TC.C5** | Checkout & Khuyến mãi | Giá cũ gạch ngang, giá mới hiển thị rõ. Phí ship miễn phí nếu đơn hàng trên 150$. | [✅] |
-| **TC.C6** | Chọn Biến thể & Cân nặng | Click vào Card cân nặng -> Hệ thống chọn Size tương ứng và highlight xanh. | [✅] |
-| **TC.C7** | Link ngược từ Giỏ hàng | Giỏ hàng -> Click sản phẩm -> Trang chi tiết load đúng Size/Màu đã chọn. | [✅] |
-| **TC.C8** | Theo dõi đơn hàng (Tracking) | Nhập mã đơn hàng và xem được trạng thái (PENDING -> SHIPPING -> ...) real-time. | [⚠️] |
-| **TC.C9** | Mega Menu 3 Tầng & Hover | Di chuột vào 'Products' hiện 3 cột (Main -> Sub -> Hot Items). Dữ liệu mượt mà, không giật lag. | [✅] |
-| **TC.C10** | Lọc theo Danh mục con | Chọn 'Pants' -> URL đổi thành `category=Fashion&subCategory=Pants` và hiển thị đúng 100% sản phẩm Quần. | [✅] |
-
----
-
-## 👩‍💼 2. Admin Management Flow (Luồng Quản trị)
-
-| ID | Test Case | Expected Result (Kết quả kỳ vọng) | Status |
-| :--- | :--- | :--- | :---: |
-| **TC.A1** | Login Admin | Đăng nhập đúng Account ADMIN/STAFF dẫn vào `/admin`. Sai Account báo lỗi khung đỏ. | [✅] |
-| **TC.A2** | Quản lý Sản phẩm (Mobile) | Trên điện thoại, danh sách sản phẩm hiển thị dạng THẺ (Cards), nút Edit/Delete to rõ, dễ thao tác. | [✅] |
-| **TC.A3** | Cập nhật Đơn hàng (Responsive Modal) | Mở chi tiết đơn hàng trên Mobile, modal phải xếp dọc thông minh, chọn được trạng thái (Status) mượt mà. | [✅] |
-| **TC.A4** | Import/Export Excel FULL | Xuất được file Excel có đủ variants/ảnh. Chỉnh sửa và Import lại thành công. | [✅] |
-| **TC.A5** | Marketing Dashboard | Quản lý các chiến dịch (Active/Expired). Các chiến dịch cũ vẫn được lưu trữ để xem báo cáo. | [⚠️] |
+| ID | Test Case | Expected Result (Kết quả kỳ vọng) |
+| :--- | :--- | :--- |
+| **TC.C1** | Responsive Trang chủ | Mọi thành phần (Hero, Features, Product Grid) phải hiển thị đúng layout trên Mobile (375px), Tablet (768px) và Desktop. |
+| **TC.C2** | Đa ngôn ngữ (i18n Sweep) | Chuyển EN: Toàn bộ Navbar, Footer, Toast thông báo, Tooltip Zalo, và trang Theo dõi đơn hàng phải đổi sang Tiếng Anh. |
+| **TC.C3** | Tỷ giá Dynamic | Giá sản phẩm VND -> USD phải được chia theo tỉ giá thực tế (lấy từ API). Không bị lỗi nhân tỉ giá 2 lần (tiền tỷ). |
+| **TC.C4** | Logic Giỏ hàng | Thêm sản phẩm cùng Size/Màu thì tăng số lượng. Thêm khác Size/Màu thì tách thành 2 dòng riêng biệt. |
+| **TC.C5** | Checkout & Phí Ship | Tổng đơn > 150$ (hoặc 3.750.000đ) thì phí vận chuyển hiển thị "Miễn phí" (Free). Ngược lại tính phí ship mặc định. |
+| **TC.C6** | Card Cân nặng (Smart Select) | Click mốc "50kg - 60kg" trên trang chi tiết -> Hệ thống tự động chọn Size M và highlight màu xanh indigo. |
+| **TC.C7** | Deep Selection Sync | Giỏ hàng chọn (Size XL, Màu Đen) -> Click vào sản phẩm -> Trang chi tiết load lên phải tự động chọn sẵn XL và Đen. |
+| **TC.C8** | Tracking Đơn hàng | Nhập mã đơn (Ví dụ: 1024) + Số điện thoại -> Hiện chi tiết đơn hàng, danh sách món đồ và tiến trình (PENDING/SHIPPING/...). |
+| **TC.C9** | Navigation Mega Menu | Di chuột qua menu Sản phẩm hiện đúng 3 cột phân loại. Click Sub-category lọc đúng danh sách sản phẩm tương ứng. |
+| **TC.C10** | Live ChatBox | Khách hàng nhắn tin -> Hiện thông báo "Đã nhận". Tin nhắn hiển thị tức thời khi Admin trả lời qua Socket.io. |
 
 ---
 
-## ⚙️ 3. System & Security (Hệ thống & Bảo mật)
+## 👩‍💼 2. Admin & Staff Management (Quản trị)
 
-| ID | Test Case | Expected Result (Kết quả kỳ vọng) | Status |
-| :--- | :--- | :--- | :---: |
-| **TC.S1** | Phân quyền Protected Path | Cố tình truy cập `/admin` bằng tài khoản khách hàng thông thường phải bị đá về `/login`. | [✅] |
-| **TC.S2** | Socket.io Stock Sync | Mở 2 trình duyệt (1 Admin, 1 Khách). Admin cập nhật số lượng kho -> Khách thấy giá trị nhảy ngay lập tức. | [ ] |
-| **TC.S3** | Custom Validation UI | Để trống các trường bắt buộc khi Register -> Khung input hiện viền đỏ rực (Tailwind) và báo lỗi tiếng Việt. | [✅] |
-| **TC.S4** | Route Collision Fix | Truy cập `/api/products/export-template` không bị hiểu nhầm thành `:id` (trả về tệp thay vì lỗi ID). | [✅] |
+| ID | Test Case | Expected Result (Kết quả kỳ vọng) |
+| :--- | :--- | :--- |
+| **TC.A1** | Role-based Login | Admin login thấy Stats doanh thu. Staff login chỉ thấy Orders/Inventory/Chat (bị ẩn stats tài chính). |
+| **TC.A2** | QL Sản phẩm (Mobile) | Danh sách sản phẩm trên màn hình nhỏ chuyển sang dạng Card (Thẻ) thay vì bảng ngang để tránh bị vỡ khung. |
+| **TC.A3** | Dashboard Analytics | Biểu đồ doanh thu 7 ngày phải load đúng dữ liệu từ DB (Prama). Best Sellers liệt kê đúng top sản phẩm bán chạy. |
+| **TC.A4** | Inventory Hotlist | Sản phẩm hết hàng (Stock = 0) phải hiện nhãn "Hết hàng" màu đỏ đậm và ưu tiên đẩy lên danh sách cảnh báo. |
+| **TC.A5** | Excel Power Tools | Xuất file mẫu -> Điền thông tin -> Import. Hệ thống phải nhận diện được các cột Phân loại và Bảng size. |
+| **TC.A6** | Phản hồi Chat | Admin chọn hội thoại của khách -> Trả lời. Khách nhận được tin nhắn ngay lập tức mà không cần F5. |
 
 ---
-🔍 *Tài liệu kiểm định được cập nhật bởi Antigravity vào ngày 23/03/2026 (Phiên bản 2.4 - Hierarchical Navigation).*
+
+## ⚙️ 3. Security & Stability (Hệ thống)
+
+| ID | Test Case | Expected Result (Kết quả kỳ vọng) |
+| :--- | :--- | :--- |
+| **TC.S1** | Protected Routes | Cố tình truy cập `/admin` khi chưa login (hoặc login tài khoản USER) phải bị chuyển hướng (Redirect) về `/admin/login`. |
+| **TC.S2** | Socket.io Sync | Mở 2 cửa sổ. Admin edit Stock 50 -> 0. Cửa sổ Khách hàng ở Home/Product phải thấy nhãn "Sold Out" hiện lên ngay sau 1-2 giây. |
+| **TC.S3** | Custom Validation | Để trống Email khi Register -> Input hiện viền đỏ rực và thông báo "Vui lòng nhập email" bằng tiếng Việt/Anh chuẩn. |
+| **TC.S4** | API Robustness | Test API `/orders/track` với mã đơn không tồn tại -> Trả về lỗi 404 kèm message "Không tìm thấy đơn hàng" thân thiện với UX. |
+
+---
+🔍 *Tài liệu kiểm định v3.0 được tối ưu hóa toàn diện bởi Antigravity vào ngày 27/03/2026.*

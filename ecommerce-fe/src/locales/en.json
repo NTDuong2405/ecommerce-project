@@ -40,7 +40,8 @@
     "view_details": "View Details",
     "quick_add": "Quick Add",
     "discount": "-{{count}}% OFF",
-    "sold_out": "Sold Out"
+    "sold_out": "Sold Out",
+    "added_to_cart_msg": "Added {{name}} ({{size}} - {{color}}) to cart! 🛒"
   },
   "cart": {
     "title": "Your Cart",
@@ -64,6 +65,11 @@
       "shop": "Shop",
       "company": "Company",
       "newsletter": "Newsletter"
+    },
+    "sections_vi": {
+      "shop": "Mua Sắm",
+      "company": "Công Ty",
+      "newsletter": "Bản Tin"
     },
     "links": {
       "all_products": "All Products",
@@ -160,5 +166,49 @@
     "discover_desc": "Discover {{total}} premium products handpicked for you.",
     "essential": "Essential",
     "profile": "Profile"
+  },
+  "tracking": {
+    "badge": "Modern Shopping Experience",
+    "title": "Order Tracking",
+    "desc": "Enter your order ID and contact info to see the journey of your package!",
+    "order_id_placeholder": "Order ID (e.g., 1024)",
+    "contact_placeholder": "Email or Phone used for order",
+    "button": "Track now",
+    "not_found": "Order not found. Please check your information again.",
+    "status": {
+      "PENDING": "Pending Confirmation",
+      "CONFIRMED": "Confirmed",
+      "SHIPPING": "Shipping",
+      "DELIVERED": "Successfully Delivered",
+      "CANCELLED": "Cancelled"
+    },
+    "shipping": {
+      "method": "Method",
+      "standard": "Standard Shipping"
+    },
+    "info": {
+      "title": "Shipping Info",
+      "recipient": "Recipient",
+      "address": "Address",
+      "note": "Note"
+    },
+    "summary": {
+      "items": "Items",
+      "subtotal": "Subtotal",
+      "shipping_fee": "Shipping Fee",
+      "total": "TOTAL",
+      "free": "Free"
+    },
+    "actions": {
+      "help": "Need help?",
+      "help_desc": "Chat with our support staff",
+      "invoice": "Export Invoice",
+      "invoice_desc": "Download online invoice (PDF)",
+      "reorder": "Buy it again",
+      "reorder_desc": "Order exactly like this again"
+    }
+  },
+  "contact": {
+    "zalo": "Chat via Zalo"
   }
 }

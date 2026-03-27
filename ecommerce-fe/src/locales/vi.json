@@ -40,7 +40,8 @@
     "view_details": "Xem chi tiết",
     "quick_add": "Mua nhanh",
     "discount": "-{{count}}% ƯU ĐÃI",
-    "sold_out": "Đã Hết Hàng"
+    "sold_out": "Đã Hết Hàng",
+    "added_to_cart_msg": "Đã thêm {{name}} ({{size}} - {{color}}) vào giỏ hàng! 🛒"
   },
   "cart": {
     "title": "Giỏ Hàng Của Bạn",
@@ -160,5 +161,49 @@
     "discover_desc": "Khám phá {{total}} sản phẩm cao cấp được tuyển chọn dành riêng cho bạn.",
     "essential": "Cơ Bản",
     "profile": "Hồ Sơ"
+  },
+  "tracking": {
+    "badge": "Trải nghiệm mua sắm hiện đại",
+    "title": "Theo dõi đơn hàng",
+    "desc": "Nhập mã đơn hàng và thông tin liên lạc để biết hành trình gói hàng của bạn nhé!",
+    "order_id_placeholder": "Mã đơn hàng (ví dụ: 1024)",
+    "contact_placeholder": "Email hoặc Số điện thoại đặt hàng",
+    "button": "Tra cứu ngay",
+    "not_found": "Không tìm thấy đơn hàng. Vui lòng kiểm tra lại thông tin.",
+    "status": {
+      "PENDING": "Chờ xác nhận",
+      "CONFIRMED": "Đã xác nhận",
+      "SHIPPING": "Đang giao hàng",
+      "DELIVERED": "Đã giao thành công",
+      "CANCELLED": "Đã hủy"
+    },
+    "shipping": {
+      "method": "Phân loại",
+      "standard": "Giao hàng Tiêu chuẩn"
+    },
+    "info": {
+      "title": "Thông tin Giao nhận",
+      "recipient": "Người nhận",
+      "address": "Địa chỉ nhận hàng",
+      "note": "Ghi chú"
+    },
+    "summary": {
+      "items": "Sản phẩm",
+      "subtotal": "Tiền hàng",
+      "shipping_fee": "Phí giao hàng",
+      "total": "TỔNG CỘNG",
+      "free": "Miễn phí"
+    },
+    "actions": {
+      "help": "Cần giúp đỡ?",
+      "help_desc": "Chat với nhân viên hỗ trợ về đơn hàng",
+      "invoice": "Xuất Hóa đơn",
+      "invoice_desc": "Tải về hóa đơn trực tuyến (PDF)",
+      "reorder": "Mua lại ngay",
+      "reorder_desc": "Đặt lại y hệt đơn hàng này"
+    }
+  },
+  "contact": {
+    "zalo": "Chat qua Zalo"
   }
 }

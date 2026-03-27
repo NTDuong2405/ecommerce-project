@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, User, Headset } from 'lucide-react';
 import api from '../utils/api';
 import { useSocket } from '../context/SocketContext';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const ChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +14,7 @@ const ChatBox = () => {
   const location = useLocation();
   const scrollRef = useRef(null);
   const chatRef = useRef(null);
+  const { t } = useTranslation();
 
   // Identity detection (optimized: computed once per render)
   let curUid = null;
@@ -177,7 +179,7 @@ const ChatBox = () => {
           target="_blank" 
           rel="noopener noreferrer"
           className="w-12 h-12 rounded-full bg-blue-500 text-white shadow-xl flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all group relative animate-slide-in-right animation-delay-200"
-          title="Chat qua Zalo"
+          title={t('contact.zalo')}
         >
           <div className="animate-gentle-swing">
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">

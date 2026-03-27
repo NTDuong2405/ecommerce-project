@@ -100,7 +100,7 @@ const ProductDetail = () => {
 
     addToCart(productData, quantity);
     setAdded(true);
-    toast.success(`Đã thêm ${product.name} (${selectedSize || ''} - ${selectedColor || ''}) vào giỏ hàng! 🛒`);
+    toast.success(t('product.added_to_cart_msg', { name: product.name, size: selectedSize || '', color: selectedColor || '' }));
     setTimeout(() => setAdded(false), 2000);
   };
 

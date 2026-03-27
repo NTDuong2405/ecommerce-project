@@ -6,58 +6,49 @@ Tài liệu này tổng hợp toàn bộ các dòng chảy nghiệp vụ (Flows)
 
 ## 👥 1. Các Vai Trò Trong Hệ Thống (Roles)
 
-| Vai trò | Nhiệm vụ chính |
-| :--- | :--- |
-| **Doanh nghiệp (Admin)** | Quản trị toàn diện hệ thống: Quản lý sản phẩm, nhân sự, xem báo cáo doanh thu, cấu hình Marketing (Flash Sale, Birthday), và quản trị hội thoại Chat. |
-| **Nhân viên (Staff)** | Xử lý các nghiệp vụ vận hành hàng ngày: Quản lý đơn hàng, theo dõi kho bãi, tương tác hỗ trợ khách hàng qua Chat. |
-| **Khách hàng (Customer)** | Trải nghiệm mua sắm: Tìm kiếm sản phẩm, đặt hàng, nhận ưu đãi tự động, chat hỗ trợ và theo dõi đơn hàng thời gian thực. |
+| Vai trò | Nhiệm vụ chính | Ghi chú bảo mật |
+| :--- | :--- | :--- |
+| **Doanh nghiệp (Admin)** | Quản trị toàn diện: Sản phẩm, nhân sự, báo cáo doanh thu, Marketing, và hội thoại Chat. | Quyền hạn cao nhất. Xem được biểu đồ Doanh thu và Lợi nhuận. |
+| **Nhân viên (Staff)** | Vận hành hàng ngày: Quản lý đơn hàng, kho bãi, hỗ trợ khách hàng. | Bị giới hạn không xem được số liệu tài chính nhạy cảm trên Dashboard. |
+| **Khách hàng (Customer)** | Mua sắm: Tìm kiếm, đặt hàng, nhận ưu đãi, chat hỗ trợ và theo dõi đơn hàng. | Truy cập công khai hoặc qua tài khoản cá nhân. |
 
 ---
 
 ## 🚀 2. Các Tính Năng Trọng Yếu (Key Features)
 
-### A. Hệ thống Marketing & Khuyến mãi Tự động
-- **Flash Sale / Catalog Sale**: Tự động áp dụng giá chiết khấu trên toàn sàn dựa theo lịch trình chiến dịch. Hiển thị nhãn giảm giá đỏ chéo và giá gốc gạch ngang đồng bộ từ Trang chủ đến Thanh toán.
-- **Birthday Campaign**: Tự động quét và gửi Voucher mừng sinh nhật cho khách hàng. Voucher có hiệu lực "kỷ luật" (chỉ trong tháng sinh nhật).
-- **Voucher Cá nhân hóa**: Hệ thống tách biệt Voucher toàn sàn (đã tính vào giá) và Voucher riêng tư (Sinh nhật, Khách quen) giúp khách hàng hưởng ưu đãi chồng ưu đãi.
+### A. Hệ thống Marketing & Đa ngôn ngữ Toàn cầu
+- **Dynamic Localization**: Hỗ trợ 100% Tiếng Việt và Tiếng Anh. Tự động chuyển đổi toàn bộ UI, thông báo (Toast), và logic tra cứu đơn hàng.
+- **Smart Currency Converter**: Tự động cập nhật tỷ giá USD/VND thời gian thực từ API. Hệ thống tự nhận diện Base Currency (VND) để hiển thị giá chính xác, tránh lạm phát số liệu khi chuyển vùng.
+- **Flash Sale & Campaign Management**: Tự động áp dụng giá chiết khấu. Quản lý trạng thái chiến dịch (Active/Expired) chuyên nghiệp.
 
-### B. Trung tâm Hỗ trợ Khách hàng Real-time
-- **Chat trực tuyến**: Khách hàng và Admin trao đổi trực tiếp qua Socket.io. Tự động lưu lịch sử hội thoại, thông báo tin nhắn mới tức thì.
-- **Notification Center**: Thông báo real-time khi có đơn hàng mới (cho Admin) hoặc khi đơn hàng đổi trạng thái (cho Khách).
+### B. Trung tâm Hỗ trợ Khách hàng Real-time (Socket.io)
+- **Omni-channel Chat**: Tích hợp ChatBox ngay tại shop. Admin/Staff phản hồi trực tiếp từ bảng điều khiển tập trung.
+- **Instant Stock Sync**: Số lượng tồn kho (Stock) được cập nhật tới người dùng ngay lập tức khi Admin thay đổi (không cần load lại trang).
+- **Notification Hub**: Thông báo tin nhắn mới và trạng thái đơn hàng tức thời.
 
 ### C. Quản lý Kho & Vận hành Thông minh
-- **Sync Tồn kho Real-time**: Số lượng kho tự động cập nhật trên mọi thiết bị người dùng ngay khi có biến động (Nhập kho hoặc Bán ra) qua Socket.io.
-- **Excel Power Tools**: Hỗ trợ xuất mẫu Template Excel, Import sản phẩm hàng loạt (kèm Phân loại/Bảng size) và Export FULL dữ liệu hiện có để sao lưu/chỉnh sửa.
-- **Thanh toán Đa kênh**: Tích hợp VNPAY, MoMo, VietQR và thanh toán khi nhận hàng (COD).
+- **Inventory Hotlist**: Dashboard tự động cảnh báo các mặt hàng sắp hết hoặc đã cháy hàng để Admin kịp thời nhập kho.
+- **Excel Power Tools**: Hỗ trợ xuất mẫu Template Excel, Import/Export sản phẩm hàng loạt cùng các phân loại phức tạp.
+- **Analytics Visualizer**: Biểu đồ doanh thu (Area Chart), thống kê Best Sellers và hành vi khách hàng trực quan bằng Recharts.
 
-### E. Advanced Product Intelligence
-- **Visual Size Chart**: Hệ thống "Card cân nặng" trực quan. Khách hàng click vào mốc cân nặng để hệ thống tự động chọn Size phù hợp nhất.
-- **Detailed Variants**: Quản lý đa chiều (Size + Màu sắc + Kho riêng). Mỗi biến thể có mã SKU và số lượng tồn kho độc lập.
-- **Deep Selection Sync**: Tự động khôi phục lựa chọn Size/Màu khi khách hàng quay lại trang chi tiết từ Giỏ hàng qua URL thông minh.
-- **Advanced Navigation**: Hệ thống Mega Menu 2-3 tầng (Main Category -> Sub-category -> Product Preview). Tự động đồng bộ hóa URL để khách hàng có thể bộ lọc sâu (vd: Fashion -> Pants) và chia sẻ link kết quả lọc trực tiếp.
-
-### D. Trải nghiệm người dùng (UX) & Bảo mật
-- **Custom UI Validation**: Thay thế thông báo mặc định của trình duyệt bằng hệ thống khung đỏ rực rỡ (Tailwind CSS) và thông báo tiếng Việt tinh tế.
-- **Bảo mật JWT**: Hệ thống phân quyền chặt chẽ giữa Khách hàng, Nhân viên và Admin. Tự động kiểm tra phiên làm việc và điều hướng đăng nhập thông minh.
+### D. Trải nghiệm Sản phẩm Đẳng cấp (UX/UI)
+- **Visual Size Selection**: Hệ thống chọn Size dựa trên cân nặng thông minh. Click mốc cân nặng -> Auto select & highlight size tương ứng.
+- **Deep Selection Recovery**: Khi khách nhấn quay lại sản phẩm từ giỏ hàng, hệ thống tự động khôi phục chính xác Size/Màu sắc đã chọn trước đó.
+- **Premium Aesthetics**: Giao diện tối giản (Minimalist), hiệu ứng Glassmorphism, Rounded 3xl, cùng bộ animation mượt mà (Slide-in, Swing, Pulse) tạo cảm giác cao cấp.
 
 ---
 
 ## 📝 3. User Stories (US) Nâng Cao
 
 ### 🧖‍♂️ Đối với Khách hàng (Customer)
-- **US.C5**: Tôi muốn thấy rõ số tiền mình tiết kiệm được (giá cũ gạch ngang) ngay trong giỏ hàng để có động lực thanh toán.
-- **US.C6**: Tôi muốn nhận được quà tặng bất ngờ vào tháng sinh nhật của mình và sử dụng nó ngay tại bước thanh toán.
-- **US.C7**: Tôi muốn chat trực tiếp với cửa hàng khi có thắc mắc về kích cỡ sản phẩm mà không cần tải lại trang.
-- **US.C8**: Tôi muốn chọn Size/Màu sắc sản phẩm một cách mượt mà, và nếu tôi chọn Size qua "Card cân nặng", hệ thống phải tự động highlight và cập nhật trạng thái chọn.
-- **US.C9**: Khi tôi click vào sản phẩm từ Giỏ hàng để xem lại chi tiết, trang sản phẩm phải tự động chọn đúng Size/Màu mà tôi đã bỏ vào giỏ trước đó.
-- **US.C10**: Tôi muốn nhập mã đơn hàng và xem được trạng thái đơn hàng của mình (PENDING -> SHIPPING -> ...) một cách real-time.
-- **US.C11**: Tôi muốn duyệt sản phẩm theo các lớp danh mục sâu hơn (vd: trong Thời trang có Quần, Áo, Áo Dài) trực tiếp từ thanh menu để tìm nhanh thứ mình cần.
+- **US.C5**: Tôi muốn giá sản phẩm tự động chuyển sang USD với tỉ giá chuẩn khi tôi chọn ngôn ngữ Tiếng Anh.
+- **US.C7**: Tôi muốn trạng thái "Thêm vào giỏ hàng" phải hiển thị bằng ngôn ngữ tôi đang chọn để dễ hiểu.
+- **US.C10**: Tôi muốn tra cứu hành trình đơn hàng của mình bằng mã ID và xem được thông tin chi tiết (Người nhận, Địa chỉ, Sản phẩm) bằng ngôn ngữ đã chọn.
 
 ### 👩‍💼 Đối với Admin/Staff
-- **US.A6**: Tôi muốn nhập hàng nghìn sản phẩm từ tệp Excel có sẵn để tiết kiệm thời gian vận hành.
-- **US.A7**: Tôi muốn biết ngay đơn hàng nào đã được thanh toán qua VNPAY/MoMo để tiến hành đóng gói mà không cần kiểm tra thủ công ngân hàng.
-- **US.A8**: Tôi muốn quản lý các chiến dịch Marketing cũ (Hết hạn) để phân tích hiệu quả kinh doanh.
-- **US.A9**: Tôi muốn xuất toàn bộ dữ liệu sản phẩm, đơn hàng, khách hàng ra file Excel để sao lưu hoặc chỉnh sửa hàng loạt.
+- **US.A7**: Là Admin, tôi muốn xem biểu đồ doanh thu 7 ngày gần nhất. Là Staff, tôi chỉ muốn thấy danh sách đơn hàng cần xử lý để tập trung làm việc.
+- **US.A9**: Tôi muốn xuất dữ liệu tồn kho ra Excel để làm việc với nhà cung cấp bên ngoài.
+- **US.A10**: Tôi muốn nhận được tin nhắn chat từ khách hàng ngay khi họ gửi mà không cần phải F5 trang quản trị.
 
 ---
 
@@ -65,19 +56,20 @@ Tài liệu này tổng hợp toàn bộ các dòng chảy nghiệp vụ (Flows)
 
 | Module | Khách hàng | Nhân viên (Staff) | Doanh nghiệp (Admin) |
 | :--- | :---: | :---: | :---: |
-| Marketing & Sale Tag | ✅ (Hưởng lợi) | ❌ | ✅ (Quản trị) |
-| Real-time Chat | ✅ | ✅ | ✅ |
-| Import/Export Excel | ❌ | ✅ | ✅ |
-| Custom Validation UX | ✅ | ✅ | ✅ |
-| VNPAY/MoMo/VietQR | ✅ | ❌ | ✅ (Xem báo cáo) |
+| Biểu đồ Doanh thu (Revenue) | ❌ | ❌ | ✅ |
+| Quản lý Đơn hàng (Orders) | ❌ | ✅ | ✅ |
+| Quản lý Sản phẩm (Inventory) | ❌ | ✅ | ✅ |
+| Real-time Notification | ✅ | ✅ | ✅ |
+| Tỉ giá Động (Exchange Rate) | ✅ | ✅ | ✅ |
 
 ---
 
-## 🎨 5. Tiêu Chuẩn Giao diện (Premium Aesthetics)
-- **Visual**: Minimalist, Dark mode friendly, Rounded 3xl, Glassmorphism.
-- **UX Feedback**: Red frames for errors, Pulsing animations for active campaigns, Smooth transitions.
-- **Localization & Finance**: 100% Tiếng Việt/English hỗ trợ, tỉ giá USD/VND cập nhật tự động.
-- **Responsiveness**: Chuẩn chỉnh 100% trên Desktop, Tablet và Mobile cho cả Shop và Admin.
+## 🎨 5. Tiêu Chuẩn Kỹ Thuật (Technical Excellence)
+- **Frontend**: React + Vite, Tailwind CSS (Mobile First).
+- **Backend**: Node.js, Express, Prisma ORM, PostgreSQL.
+- **Real-time**: Socket.io v4.
+- **Animation**: CSS Keyframes (Gentle-swing, Slide-in-right) & Lucide Icons.
+- **Validation**: Frontend custom validation (Tailwind Ring/Shadow) + Server-side Prisma check.
 
 ---
-🚀 *Tài liệu cập nhật lần cuối bởi Antigravity (Google DeepMind Team) vào ngày 23/03/2026.*
+🚀 *Tài liệu cập nhật chuẩn hóa bởi Antigravity vào ngày 27/03/2026 (Phiên bản 3.0 - Global Commerce).*
