@@ -5,6 +5,7 @@ import api from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomerNotificationBell from './CustomerNotificationBell';
 import { useTranslation } from 'react-i18next';
+import { formatPrice } from '../utils/format';
 
 const CATEGORIES = ['Clothing', 'Shoes', 'Bags', 'Accessories', 'Tech'];
 const SUB_CATEGORY_MAP = {
@@ -177,7 +178,7 @@ const Navbar = () => {
                              <img src={p.images?.[0]?.url} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" />
                            </div>
                            <div className="text-[11px] font-bold text-slate-800 truncate">{p.name}</div>
-                           <div className="text-[10px] font-bold text-primary-600">${p.price?.toLocaleString()}</div>
+                           <div className="text-[10px] font-bold text-primary-600">{formatPrice(p.price)}</div>
                          </Link>
                        ))
                     ) : (
