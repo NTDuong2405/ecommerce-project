@@ -169,6 +169,47 @@ const ChatBox = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-[999]" ref={chatRef}>
+      {/* Floating Social Buttons (Above main bubble) */}
+      <div className={`flex flex-col gap-3 mb-4 transition-all duration-500 ${isOpen ? 'opacity-0 scale-75 pointer-events-none translate-y-10' : 'opacity-100 scale-100 translate-y-0'}`}>
+        {/* Zalo Button */}
+        <a 
+          href="https://zalo.me/your_phone_number" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="w-12 h-12 rounded-full bg-blue-500 text-white shadow-xl flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all group relative animate-slide-in-right animation-delay-200"
+          title="Chat qua Zalo"
+        >
+          <div className="animate-gentle-swing">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 12.03c-.2.74-.84 1.34-1.58 1.54-.74.2-2.34.25-3.32.22-.98-.03-2.31-.19-3.05-.33-.74-.14-1.18-.54-1.39-1.28-.21-.74-.21-1.48-.21-2.22s0-1.48.21-2.22c.21-.74.65-1.14 1.39-1.28.74-.14 2.07-.3 3.05-.33.98-.03 2.58.02 3.32.22.74.2 1.38.8 1.58 1.54.2.74.23 1.48.23 2.22s-.03 1.48-.23 2.22zM12 9.5c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z"/>
+            </svg>
+          </div>
+          {/* Tooltip */}
+          <span className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
+            Zalo: 09xx xxx xxx
+          </span>
+        </a>
+
+        {/* Facebook Button */}
+        <a 
+          href="https://facebook.com/your_page" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="w-12 h-12 rounded-full bg-indigo-600 text-white shadow-xl flex items-center justify-center hover:bg-indigo-700 hover:scale-110 transition-all group relative animate-slide-in-right animation-delay-100"
+          title="Facebook Messenger"
+        >
+          <div className="animate-gentle-swing" style={{ animationDelay: '1s' }}>
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path d="M12 2.04c-5.5 0-9.96 4.46-9.96 9.96 0 5 3.66 9.15 8.44 9.89v-6.99h-2.54v-2.9h2.54v-2.21c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v6.99c4.78-.74 8.44-4.89 8.44-9.89 0-5.5-4.46-9.96-9.96-9.96z"/>
+            </svg>
+          </div>
+          {/* Tooltip */}
+          <span className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
+            VibeCart Messenger
+          </span>
+        </a>
+      </div>
+
       {/* Nút bong bóng chat */}
       <button 
         onClick={() => setIsOpen(!isOpen)}

@@ -6,6 +6,8 @@ import { formatPrice } from '../../utils/format';
 import { useTranslation } from 'react-i18next';
 
 
+const CATEGORIES = ['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home'];
+
 const Products = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,15 +21,6 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [selectedSubCategory, setSelectedSubCategory] = useState(searchParams.get('subCategory') || '');
-  const [categories] = useState(['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home']);
-
-  const subCategoryMap = {
-    Fashion: ['Áo Dài', 'Streetwear', 'Pants', 'T-Shirt', 'Polo'],
-    Tech: ['Smartphone', 'Audio', 'Laptop', 'Smart Home'],
-    Accessories: ['Watch', 'Bag', 'Jewelry'],
-    Beauty: ['Skincare', 'Makeup', 'Body Care'],
-    Home: ['Pottery/Basket', 'Vase', 'Furniture', 'Decoration']
-  };
   const sortParam = searchParams.get('sort');
   const limit = 8;
 
@@ -113,7 +106,7 @@ const Products = () => {
           >
             {t('filter.all')}
           </button>
-          {categories.map(cat => (
+          {CATEGORIES.map(cat => (
             <button
               key={cat}
               onClick={() => updateCategory(cat)}
@@ -191,8 +184,14 @@ const Products = () => {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {products.map((product, idx) => (
+            <div 
+              key={product.id} 
+              className="animate-zoom-in-up" 
+              style={{ animationDelay: `${idx * 100}ms` }}
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
       )}

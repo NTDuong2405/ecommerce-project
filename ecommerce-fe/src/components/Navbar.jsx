@@ -1,10 +1,19 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, User, Menu, X, LogOut, Globe, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import api from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomerNotificationBell from './CustomerNotificationBell';
 import { useTranslation } from 'react-i18next';
+
+const CATEGORIES = ['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home'];
+const SUB_CATEGORY_MAP = {
+  Fashion: ['Áo Dài', 'Streetwear', 'Pants', 'T-Shirt', 'Polo'],
+  Tech: ['Smartphone', 'Audio', 'Laptop', 'Smart Home'],
+  Accessories: ['Watch', 'Bag', 'Jewelry'],
+  Beauty: ['Skincare', 'Makeup', 'Body Care'],
+  Home: ['Pottery/Basket', 'Vase', 'Furniture', 'Decoration']
+};
 
 const Navbar = () => {
   const { totalItems } = useCart();
@@ -14,14 +23,6 @@ const Navbar = () => {
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Fashion');
   const [catProducts, setCatProducts] = useState({});
-  const [categories] = useState(['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home']);
-  const subCategoryMap = {
-    Fashion: ['Áo Dài', 'Streetwear', 'Pants', 'T-Shirt', 'Polo'],
-    Tech: ['Smartphone', 'Audio', 'Laptop', 'Smart Home'],
-    Accessories: ['Watch', 'Bag', 'Jewelry'],
-    Beauty: ['Skincare', 'Makeup', 'Body Care'],
-    Home: ['Pottery/Basket', 'Vase', 'Furniture', 'Decoration']
-  };
 
   const fetchProductsPreview = async (cat) => {
     if (catProducts[cat]) return;
@@ -95,7 +96,7 @@ const Navbar = () => {
                 {/* Tier 1: Categories */}
                 <div className="w-1/3 border-r border-slate-100 pr-4 space-y-1">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{t('filter.categories')}</div>
-                  {categories.map((cat) => (
+                  {CATEGORIES.map((cat) => (
                     <button
                       key={cat}
                       onMouseEnter={() => {
@@ -127,7 +128,7 @@ const Navbar = () => {
                 <div className="w-[180px] border-r border-slate-100 px-6 py-2 animate-fade-in">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{t('filter.explore', { category: t(`categories.${activeCategory}`) })}</div>
                   <div className="space-y-1">
-                    {subCategoryMap[activeCategory]?.map(sub => (
+                    {SUB_CATEGORY_MAP[activeCategory]?.map(sub => (
                       <Link 
                         key={sub}
                         to={`/products?category=${activeCategory}&subCategory=${sub}`}
@@ -137,7 +138,7 @@ const Navbar = () => {
                         {t(`categories.${activeCategory}_items.${sub}`)}
                       </Link>
                     ))}
-                    {!subCategoryMap[activeCategory] && (
+                    {!SUB_CATEGORY_MAP[activeCategory] && (
                       <div className="text-[11px] text-slate-400 italic">{t('filter.no_sub')}</div>
                     )}
                   </div>

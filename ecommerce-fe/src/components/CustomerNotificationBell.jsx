@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, MessageCircle, Gift, X, Star, CheckCheck } from 'lucide-react';
+import { Bell, MessageCircle, Gift, Star, CheckCheck } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';

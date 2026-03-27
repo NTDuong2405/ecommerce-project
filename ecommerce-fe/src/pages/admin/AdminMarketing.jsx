@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Megaphone, Cake, Send, Plus, Calendar, Tag, AlertCircle, CheckCircle, Trash2 } from 'lucide-react';
+import { Megaphone, Cake, Send, Plus, Calendar, AlertCircle, CheckCircle, Trash2 } from 'lucide-react';
 
 const AdminMarketing = () => {
   const [promotions, setPromotions] = useState([]);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { Search, CheckCircle, Save, AlertTriangle, Upload, FileSpreadsheet, Download } from 'lucide-react';
+import { Search, CheckCircle, Save, AlertTriangle, FileSpreadsheet, Download } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 
 const AdminInventory = () => {
