@@ -17,7 +17,7 @@ const Cart = () => {
           <ShoppingBag size={40} className="text-slate-300" />
         </div>
         <h2 className="text-2xl font-display font-bold text-slate-800 mb-2">{t('cart.empty')}</h2>
-        <p className="text-slate-500 mb-8">Looks like you haven't added anything yet.</p>
+        <p className="text-slate-500 mb-8">{t('cart.empty_desc')}</p>
         <Link
           to="/products"
           className="inline-flex items-center gap-2 bg-slate-900 text-white px-7 py-3.5 rounded-full font-semibold hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
@@ -32,13 +32,13 @@ const Cart = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-display font-bold text-slate-900">
-          {t('cart.title')} <span className="text-slate-400 font-normal text-xl ml-2">({items.length} items)</span>
+          {t('cart.title')} <span className="text-slate-400 font-normal text-xl ml-2">({items.length} {t('cart.items_count')})</span>
         </h1>
         <button
           onClick={clearCart}
           className="text-sm text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1.5"
         >
-          <Trash2 size={15} /> Clear all
+          <Trash2 size={15} /> {t('cart.clear_all')}
         </button>
       </div>
 
@@ -73,8 +73,8 @@ const Cart = () => {
                   </div>
                   {(item.size || item.color) && (
                     <div className="flex items-center gap-2">
-                       {item.size && <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Size: {item.size}</span>}
-                       {item.color && <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Color: {item.color}</span>}
+                       {item.size && <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">{t('product_detail.size')}: {item.size}</span>}
+                       {item.color && <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">{t('product_detail.color')}: {item.color}</span>}
                     </div>
                   )}
                 </div>
@@ -100,7 +100,7 @@ const Cart = () => {
                 </div>
 
                 <div className="text-right shrink-0">
-                  <div className="text-xs text-slate-400 font-medium mb-0.5 uppercase tracking-wider">Subtotal</div>
+                  <div className="text-xs text-slate-400 font-medium mb-0.5 uppercase tracking-wider">{t('cart.subtotal')}</div>
                   <div className="font-black text-slate-900 text-lg">{formatPrice(item.price * item.quantity)}</div>
                 </div>
               </div>
@@ -120,7 +120,7 @@ const Cart = () => {
         {/* ── Order Summary ── */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sticky top-24">
-            <h2 className="font-display font-bold text-lg text-slate-900 mb-5">Order Summary</h2>
+            <h2 className="font-display font-bold text-lg text-slate-900 mb-5">{t('cart.order_summary')}</h2>
 
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-slate-600">
@@ -133,7 +133,7 @@ const Cart = () => {
               </div>
               {totalPrice < 150 && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 text-xs rounded-xl px-3 py-2">
-                  Add {formatPrice(150 - totalPrice)} more for free shipping!
+                  {t('cart.free_shipping_hint', { amount: formatPrice(150 - totalPrice) })}
                 </div>
               )}
               <div className="border-t border-slate-100 pt-3 flex justify-between font-bold text-base text-slate-900">
@@ -153,7 +153,7 @@ const Cart = () => {
               to="/products"
               className="mt-3 w-full flex items-center justify-center text-sm text-slate-500 hover:text-primary-600 py-2 transition-colors"
             >
-              ← Continue Shopping
+                {t('cart.continue_shopping')}
             </Link>
           </div>
         </div>

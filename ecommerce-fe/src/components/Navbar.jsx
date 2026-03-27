@@ -94,7 +94,7 @@ const Navbar = () => {
               <div className={`absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 transition-all duration-300 origin-top overflow-hidden p-6 flex gap-6 ${isProductsDropdownOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                 {/* Tier 1: Categories */}
                 <div className="w-1/3 border-r border-slate-100 pr-4 space-y-1">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Categories</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{t('filter.categories')}</div>
                   {categories.map((cat) => (
                     <button
                       key={cat}
@@ -110,7 +110,7 @@ const Navbar = () => {
                         activeCategory === cat ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-50'
                       }`}
                     >
-                      {cat}
+                      {t(`categories.${cat}`)}
                       <ChevronRight size={14} className={`transition-transform ${activeCategory === cat ? 'translate-x-0 opacity-100' : '-translate-x-2 opacity-0 group-hover/cat:translate-x-0 group-hover/cat:opacity-100'}`} />
                     </button>
                   ))}
@@ -119,13 +119,13 @@ const Navbar = () => {
                     onClick={() => setIsProductsDropdownOpen(false)}
                     className="block w-full text-left px-4 py-3 rounded-xl font-bold text-xs text-primary-600 hover:bg-primary-50 transition-all mt-4"
                   >
-                    View All Products →
+                    {t('filter.view_all')}
                   </Link>
                 </div>
 
                 {/* Tier 2: Sub-categories list */}
                 <div className="w-[180px] border-r border-slate-100 px-6 py-2 animate-fade-in">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Explore {activeCategory}</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{t('filter.explore', { category: t(`categories.${activeCategory}`) })}</div>
                   <div className="space-y-1">
                     {subCategoryMap[activeCategory]?.map(sub => (
                       <Link 
@@ -134,18 +134,18 @@ const Navbar = () => {
                         onClick={() => setIsProductsDropdownOpen(false)}
                         className="block px-3 py-2 rounded-lg text-[13px] font-bold text-slate-700 hover:bg-slate-50 hover:text-primary-600 transition-all"
                       >
-                        {sub}
+                        {t(`categories.${activeCategory}_items.${sub}`)}
                       </Link>
                     ))}
                     {!subCategoryMap[activeCategory] && (
-                      <div className="text-[11px] text-slate-400 italic">No sub-categories</div>
+                      <div className="text-[11px] text-slate-400 italic">{t('filter.no_sub')}</div>
                     )}
                   </div>
                 </div>
 
                 {/* Tier 3: Products preview */}
                 <div className="flex-1 px-6 py-2 animate-fade-in overflow-y-auto max-h-[400px]">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Recent {activeCategory} Items</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{t('filter.recent', { category: t(`categories.${activeCategory}`) })}</div>
                   <div className="grid grid-cols-2 gap-4">
                     {(catProducts[activeCategory] || []).length > 0 ? (
                        catProducts[activeCategory].map(p => (
@@ -165,7 +165,7 @@ const Navbar = () => {
                     ) : (
                       <div className="col-span-2 py-10 flex flex-col items-center justify-center text-slate-300">
                         <ShoppingBag size={32} />
-                        <span className="text-[10px] uppercase font-bold mt-2">No items found</span>
+                        <span className="text-[10px] uppercase font-bold mt-2">{t('search.no_results')}</span>
                       </div>
                     )}
                   </div>
@@ -210,7 +210,7 @@ const Navbar = () => {
                   <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-all text-[10px] font-bold">
                     {user.email?.[0]?.toUpperCase()}
                   </div>
-                  <span className="text-sm font-bold hidden lg:inline">Profile</span>
+                  <span className="text-sm font-bold hidden lg:inline">{t('products_page.profile')}</span>
                 </Link>
                 <button 
                   onClick={handleLogout}

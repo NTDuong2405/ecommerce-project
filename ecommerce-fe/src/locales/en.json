@@ -50,7 +50,13 @@
     "total": "Total",
     "checkout": "Proceed to Checkout",
     "free": "Free",
-    "reviews": "reviews"
+    "reviews": "reviews",
+    "empty_desc": "Looks like you haven't added anything yet.",
+    "items_count": "items",
+    "clear_all": "Clear all",
+    "order_summary": "Order Summary",
+    "free_shipping_hint": "Add {{amount}} more for free shipping!",
+    "continue_shopping": "← Continue Shopping"
   },
   "footer": {
     "desc": "Your premium destination for exclusive items. We provide the best quality products for your lifestyle.",
@@ -76,5 +82,83 @@
     "symbol": "$",
     "code": "USD",
     "rate": 1
+  },
+  "product_detail": {
+    "premium_essential": "Premium Essential",
+    "color": "Color",
+    "size": "Size",
+    "not_selected": "Not selected",
+    "no_variants": "This product has no separate variants",
+    "size_guide": "Size and weight suggestions",
+    "choose_weight": "Choose according to your weight",
+    "suggested_weight": "Suggested weight",
+    "size_chart": "Size chart",
+    "updating_size": "Size chart info is being updated...",
+    "size_selection_note": "* You are selecting Size {{size}}. Please check height again if needed.",
+    "weight_hint": "Size {{size}} suggested for weight {{weight}}.",
+    "added": "Added!",
+    "returns": "30-Day Returns",
+    "reviews_count": "{{count}} reviews"
+  },
+  "search": {
+    "placeholder": "Search products...",
+    "button": "Search",
+    "no_results": "No products found",
+    "adjust_filters": "Try adjusting your search or filters.",
+    "min_price": "Min $",
+    "max_price": "Max $"
+  },
+  "filter": {
+    "all": "All Products",
+    "categories": "Categories",
+    "explore": "Explore {{category}}",
+    "no_sub": "No sub-categories",
+    "recent": "Recent {{category}} Items",
+    "view_all": "View All Products →",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "categories": {
+    "Fashion": "Fashion",
+    "Tech": "Tech",
+    "Accessories": "Accessories",
+    "Beauty": "Beauty",
+    "Home": "Home",
+    "Fashion_items": {
+      "Áo Dài": "Áo Dài",
+      "Streetwear": "Streetwear",
+      "Pants": "Pants",
+      "T-Shirt": "T-Shirt",
+      "Polo": "Polo"
+    },
+    "Tech_items": {
+      "Smartphone": "Smartphone",
+      "Audio": "Audio",
+      "Laptop": "Laptop",
+      "Smart Home": "Smart Home"
+    },
+    "Accessories_items": {
+      "Watch": "Watch",
+      "Bag": "Bag",
+      "Jewelry": "Jewelry"
+    },
+    "Beauty_items": {
+      "Skincare": "Skincare",
+      "Makeup": "Makeup",
+      "Body Care": "Body Care"
+    },
+    "Home_items": {
+      "Pottery/Basket": "Pottery/Basket",
+      "Vase": "Vase",
+      "Furniture": "Furniture",
+      "Decoration": "Decoration"
+    }
+  },
+  "products_page": {
+    "title_our": "Our",
+    "title_collection": "Collection",
+    "discover_desc": "Discover {{total}} premium products handpicked for you.",
+    "essential": "Essential",
+    "profile": "Profile"
   }
 }

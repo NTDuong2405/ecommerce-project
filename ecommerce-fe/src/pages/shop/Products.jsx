@@ -97,9 +97,9 @@ const Products = () => {
       {/* Header */}
       <div className="mb-10">
         <h1 className="text-4xl md:text-5xl font-display font-extrabold text-slate-900 mb-3">
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600">Collection</span>
+          {t('products_page.title_our')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600">{t('products_page.title_collection')}</span>
         </h1>
-        <p className="text-slate-500 text-lg">Discover {total} premium products handpicked for you.</p>
+        <p className="text-slate-500 text-lg">{t('products_page.discover_desc', { total })}</p>
 
         {/* Category Chips */}
         <div className="flex flex-wrap items-center gap-2 mt-8">
@@ -111,7 +111,7 @@ const Products = () => {
                 : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
             }`}
           >
-            All Products
+            {t('filter.all')}
           </button>
           {categories.map(cat => (
             <button
@@ -123,7 +123,7 @@ const Products = () => {
                   : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
               }`}
             >
-              {cat}
+              {t(`categories.${cat}`)}
             </button>
           ))}
         </div>
@@ -137,14 +137,14 @@ const Products = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t('search.placeholder')}
               className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
           </div>
           <button type="submit" className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-medium text-sm hover:bg-slate-700 transition-colors">
-            Search
+            {t('search.button')}
           </button>
         </form>
 
@@ -153,7 +153,7 @@ const Products = () => {
           <SlidersHorizontal size={18} className="text-slate-400" />
           <input
             type="number"
-            placeholder="Min $"
+            placeholder={t('search.min_price')}
             className="w-24 px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm"
             value={minPrice}
             onChange={(e) => { setMinPrice(e.target.value); setPage(1); }}
@@ -161,7 +161,7 @@ const Products = () => {
           <span className="text-slate-400">—</span>
           <input
             type="number"
-            placeholder="Max $"
+            placeholder={t('search.max_price')}
             className="w-24 px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-sm"
             value={maxPrice}
             onChange={(e) => { setMaxPrice(e.target.value); setPage(1); }}
@@ -186,8 +186,8 @@ const Products = () => {
       ) : products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-slate-500">
           <ShoppingBag size={56} className="mb-4 text-slate-300" />
-          <p className="text-xl font-semibold font-display text-slate-700">No products found</p>
-          <p className="text-sm mt-2">Try adjusting your search or filters.</p>
+          <p className="text-xl font-semibold font-display text-slate-700">{t('search.no_results')}</p>
+          <p className="text-sm mt-2">{t('search.adjust_filters')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -205,7 +205,7 @@ const Products = () => {
             onClick={() => setPage(p => p - 1)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            <ArrowLeft size={16} /> Prev
+            <ArrowLeft size={16} /> {t('filter.prev')}
           </button>
           <div className="flex items-center gap-1">
             {Array.from({ length: totalPages }).map((_, i) => (
@@ -223,7 +223,7 @@ const Products = () => {
             onClick={() => setPage(p => p + 1)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Next <ArrowRight size={16} />
+            {t('filter.next')} <ArrowRight size={16} />
           </button>
         </div>
       )}
@@ -253,7 +253,7 @@ const ProductCard = ({ product }) => {
         </div>
         {product.stock === 0 && (
           <div className="absolute bottom-0 left-0 right-0 bg-slate-900/80 text-white text-xs font-bold text-center py-2">
-            OUT OF STOCK
+            {t('product.out_of_stock')}
           </div>
         )}
 
@@ -265,12 +265,12 @@ const ProductCard = ({ product }) => {
         )}
         <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300">
           <div className="w-full py-2.5 bg-white/95 backdrop-blur-md text-slate-900 font-bold rounded-xl shadow-lg text-center text-sm">
-            View Details →
+            {t('product.view_details')} →
           </div>
         </div>
       </div>
       <div className="p-5 flex flex-col flex-1">
-        <div className="text-xs font-semibold text-primary-600 uppercase tracking-wider mb-1.5">Essential</div>
+        <div className="text-xs font-semibold text-primary-600 uppercase tracking-wider mb-1.5">{t('products_page.essential')}</div>
         <h3 className="text-base font-bold text-slate-900 font-display mb-2 line-clamp-2">{product.name}</h3>
         <div className="mt-auto">
           <div className="flex items-center gap-2 mb-1">
@@ -280,7 +280,7 @@ const ProductCard = ({ product }) => {
             )}
           </div>
           {product.stock > 0 && product.stock <= 10 && (
-            <span className="text-xs text-orange-600 font-semibold italic">Only {product.stock} left!</span>
+            <span className="text-xs text-orange-600 font-semibold italic">{t('product.only_left', { count: product.stock })}</span>
           )}
         </div>
       </div>

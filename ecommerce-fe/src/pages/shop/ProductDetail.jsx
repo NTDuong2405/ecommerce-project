@@ -140,9 +140,9 @@ const ProductDetail = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       {/* Breadcrumb */}
       <div className="mb-8 flex items-center gap-2 text-sm text-slate-500">
-        <Link to="/" className="hover:text-primary-600 transition-colors">Home</Link>
+        <Link to="/" className="hover:text-primary-600 transition-colors">{t('nav.home')}</Link>
         <span>/</span>
-        <Link to="/products" className="hover:text-primary-600 transition-colors">Collection</Link>
+        <Link to="/products" className="hover:text-primary-600 transition-colors">{t('nav.products')}</Link>
         <span>/</span>
         <span className="text-slate-800 font-medium truncate max-w-[180px]">{product.name}</span>
       </div>
@@ -195,7 +195,7 @@ const ProductDetail = () => {
 
             {!inStock && (
               <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center z-20">
-                <span className="bg-white text-slate-900 font-bold px-6 py-2 rounded-full shadow-xl animate-bounce">Out of Stock</span>
+                <span className="bg-white text-slate-900 font-bold px-6 py-2 rounded-full shadow-xl animate-bounce">{t('product.out_of_stock')}</span>
               </div>
             )}
           </div>
@@ -224,7 +224,7 @@ const ProductDetail = () => {
         <div className="flex flex-col space-y-6 py-2">
           {/* Badge + Wish */}
           <div className="flex items-center justify-between">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-700 uppercase tracking-wider">Premium Essential</span>
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-700 uppercase tracking-wider">{t('product_detail.premium_essential')}</span>
             <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 transition-all">
               <Heart size={18} />
             </button>
@@ -239,7 +239,7 @@ const ProductDetail = () => {
                 <Star key={s} size={18} className={s <= 4 ? 'text-yellow-400 fill-yellow-400' : 'text-slate-300 fill-slate-200'} />
               ))}
             </div>
-            <span className="text-sm font-medium text-slate-600">4.8 (124 reviews)</span>
+            <span className="text-sm font-medium text-slate-600">4.8 ({t('product_detail.reviews_count', { count: 124 })})</span>
           </div>
 
           {/* Price */}
@@ -269,7 +269,7 @@ const ProductDetail = () => {
                 {[...new Set((product.variants || []).filter(v => v?.color).map(v => v.color))].length > 0 && (
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-bold text-slate-900 uppercase tracking-wide">Màu sắc: {selectedColor || 'Chưa chọn'}</span>
+                      <span className="text-sm font-bold text-slate-900 uppercase tracking-wide">{t('product_detail.color')}: {selectedColor || t('product_detail.not_selected')}</span>
                     </div>
                   <div className="flex flex-wrap gap-2">
                     {[...new Set((product.variants || []).filter(v => v?.color).map(v => v.color))].map(color => (
@@ -294,8 +294,8 @@ const ProductDetail = () => {
                   <div className="space-y-3 pt-2">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-slate-900 uppercase tracking-wide text-xs">Kích cỡ:</span>
-                        <span className="text-sm font-black text-slate-900">{selectedSize || 'Chưa chọn'}</span>
+                        <span className="text-sm font-bold text-slate-900 uppercase tracking-wide text-xs">{t('product_detail.size')}:</span>
+                        <span className="text-sm font-black text-slate-900">{selectedSize || t('product_detail.not_selected')}</span>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -324,7 +324,7 @@ const ProductDetail = () => {
                             <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 flex items-center gap-3 animate-fade-in-up">
                               <Shield size={18} className="text-emerald-600" />
                               <div className="text-[13px] leading-tight text-emerald-900">
-                                 Size <span className="font-black">{selectedSize}</span> gợi ý cho cân nặng <span className="font-black italic">{weightStr}</span>.
+                                 {t('product_detail.weight_hint', { size: selectedSize, weight: weightStr })}
                               </div>
                             </div>
                           );
@@ -336,7 +336,7 @@ const ProductDetail = () => {
               </>
             ) : (
               <div className="py-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">Sản phẩm này không có phân loại riêng</span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">{t('product_detail.no_variants')}</span>
               </div>
             )}
           </div>
@@ -347,9 +347,9 @@ const ProductDetail = () => {
               <div className="flex items-center justify-between mb-4">
                  <div className="flex items-center gap-2">
                     <Shield size={16} className="text-primary-600" />
-                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Gợi ý chọn size và cân nặng</h3>
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">{t('product_detail.size_guide')}</h3>
                  </div>
-                 <span className="text-[10px] text-slate-400 font-medium italic">Chọn theo cân nặng của bạn</span>
+                 <span className="text-[10px] text-slate-400 font-medium italic">{t('product_detail.choose_weight')}</span>
               </div>
               
               {product.sizeChart ? (
@@ -370,7 +370,7 @@ const ProductDetail = () => {
                           <div className={`w-9 h-9 rounded-full flex items-center justify-center mb-2 transition-colors ${selectedSize === s ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200'}`}>
                              <span className="text-sm font-black">{s}</span>
                           </div>
-                          <div className="text-[9px] uppercase font-bold text-slate-400 tracking-tighter mb-1 select-none">Cân nặng gợi ý</div>
+                          <div className="text-[9px] uppercase font-bold text-slate-400 tracking-tighter mb-1 select-none">{t('product_detail.suggested_weight')}</div>
                           <div className={`text-xs font-black transition-colors ${selectedSize === s ? 'text-primary-900' : 'text-slate-700'}`}>
                              {weight}
                           </div>
@@ -385,7 +385,7 @@ const ProductDetail = () => {
                     } catch (e) {
                       return (
                         <div className="col-span-full bg-slate-50 rounded-2xl p-6 text-center border border-slate-100 italic text-slate-400 text-xs">
-                           Bảng size: {product.sizeChart}
+                           {t('product_detail.size_chart')}: {product.sizeChart}
                         </div>
                       );
                     }
@@ -393,14 +393,14 @@ const ProductDetail = () => {
                 </div>
               ) : (
                 <div className="bg-slate-50 rounded-2xl p-6 text-center border-2 border-dashed border-slate-200">
-                   <p className="text-xs text-slate-400 font-medium italic">Thông tin bảng size đang được cập nhật...</p>
+                   <p className="text-xs text-slate-400 font-medium italic">{t('product_detail.updating_size')}</p>
                 </div>
               )}
               
               {/* Extra helper hint */}
               {selectedSize && (
                  <p className="mt-4 text-[10px] text-slate-400 text-center italic">
-                    * Bạn đang chọn <span className="text-primary-600 font-bold uppercase">Size {selectedSize}</span>. Vui lòng kiểm tra lại chiều cao nếu cần tỉ mỉ hơn.
+                    {t('product_detail.size_selection_note', { size: selectedSize })}
                  </p>
               )}
             </div>
@@ -410,7 +410,7 @@ const ProductDetail = () => {
           <div className="flex items-center gap-2">
             <div className={`w-2.5 h-2.5 rounded-full ${inStock ? 'bg-emerald-500' : 'bg-red-500'}`} />
             <span className={`text-sm font-semibold ${inStock ? 'text-emerald-600' : 'text-red-600'}`}>
-              {inStock ? `${product.stock} in stock` : 'Out of stock'}
+              {inStock ? `${product.stock} ${t('product.in_stock')}` : t('product.out_of_stock')}
             </span>
           </div>
 
@@ -443,16 +443,16 @@ const ProductDetail = () => {
                   : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
-              {added ? <><Check size={20} /> Added!</> : <><ShoppingBag size={20} /> Add to Cart</>}
+              {added ? <><Check size={20} /> {t('product_detail.added')}</> : <><ShoppingBag size={20} /> {t('product.add_to_cart')}</>}
             </button>
           </div>
 
           {/* Trust signals */}
           <div className="grid grid-cols-3 gap-3 pt-2">
             {[
-              { icon: <Truck size={18} />, text: 'Free Delivery' },
-              { icon: <Shield size={18} />, text: '1 Year Warranty' },
-              { icon: <RotateCcw size={18} />, text: '30-Day Returns' },
+              { icon: <Truck size={18} />, text: t('home.features.delivery') },
+              { icon: <Shield size={18} />, text: t('home.features.warranty') },
+              { icon: <RotateCcw size={18} />, text: t('product_detail.returns') },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center text-center gap-1.5 p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <span className="text-primary-600">{item.icon}</span>

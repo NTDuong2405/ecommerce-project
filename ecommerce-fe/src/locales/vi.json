@@ -50,7 +50,13 @@
     "total": "Tổng cộng",
     "checkout": "Tiến hành Thanh toán",
     "free": "Miễn phí",
-    "reviews": "đánh giá"
+    "reviews": "đánh giá",
+    "empty_desc": "Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng.",
+    "items_count": "sản phẩm",
+    "clear_all": "Xóa tất cả",
+    "order_summary": "Tóm tắt đơn hàng",
+    "free_shipping_hint": "Thêm {{amount}} để được miễn phí vận chuyển!",
+    "continue_shopping": "← Tiếp tục mua sắm"
   },
   "footer": {
     "desc": "Điểm đến cao cấp cho những sản phẩm độc quyền. Chúng tôi cung cấp những sản phẩm tốt nhất cho phong cách sống của bạn.",
@@ -76,5 +82,83 @@
     "symbol": "đ",
     "code": "VND",
     "rate": 25000
+  },
+  "product_detail": {
+    "premium_essential": "Sản Phẩm Cao Cấp",
+    "color": "Màu sắc",
+    "size": "Kích cỡ",
+    "not_selected": "Chưa chọn",
+    "no_variants": "Sản phẩm này không có phân loại riêng",
+    "size_guide": "Gợi ý chọn size và cân nặng",
+    "choose_weight": "Chọn theo cân nặng của bạn",
+    "suggested_weight": "Cân nặng gợi ý",
+    "size_chart": "Bảng size",
+    "updating_size": "Thông tin bảng size đang được cập nhật...",
+    "size_selection_note": "* Bạn đang chọn Size {{size}}. Vui lòng kiểm tra lại chiều cao nếu cần tỉ mỉ hơn.",
+    "weight_hint": "Size {{size}} gợi ý cho cân nặng {{weight}}.",
+    "added": "Đã thêm!",
+    "returns": "Đổi trả 30 ngày",
+    "reviews_count": "{{count}} đánh giá"
+  },
+  "search": {
+    "placeholder": "Tìm kiếm sản phẩm...",
+    "button": "Tìm kiếm",
+    "no_results": "Không tìm thấy sản phẩm",
+    "adjust_filters": "Hãy thử điều chỉnh lại tìm kiếm hoặc bộ lọc.",
+    "min_price": "Giá tối thiểu",
+    "max_price": "Giá tối đa"
+  },
+  "filter": {
+    "all": "Tất Cả Sản Phẩm",
+    "categories": "Danh Mục",
+    "explore": "Khám phá {{category}}",
+    "no_sub": "Không có danh mục con",
+    "recent": "Sản phẩm {{category}} mới đây",
+    "view_all": "Xem tất cả sản phẩm →",
+    "prev": "Trước",
+    "next": "Tiếp"
+  },
+  "categories": {
+    "Fashion": "Thời Trang",
+    "Tech": "Công Nghệ",
+    "Accessories": "Phụ Kiện",
+    "Beauty": "Làm Đẹp",
+    "Home": "Nhà Cửa",
+    "Fashion_items": {
+      "Áo Dài": "Áo Dài",
+      "Streetwear": "Thời Trang Đường Phố",
+      "Pants": "Quần",
+      "T-Shirt": "Áo Thun",
+      "Polo": "Áo Polo"
+    },
+    "Tech_items": {
+      "Smartphone": "Điện Thoại",
+      "Audio": "Âm Thanh",
+      "Laptop": "Máy Tính Xách Tay",
+      "Smart Home": "Nhà Thông Minh"
+    },
+    "Accessories_items": {
+      "Watch": "Đồng Hồ",
+      "Bag": "Túi Xách",
+      "Jewelry": "Trang Sức"
+    },
+    "Beauty_items": {
+      "Skincare": "Chăm Sóc Da",
+      "Makeup": "Trang Điểm",
+      "Body Care": "Chăm Sóc Cơ Thể"
+    },
+    "Home_items": {
+      "Pottery/Basket": "Gốm/Mây Tre",
+      "Vase": "Bình Hoa",
+      "Furniture": "Nội Thất",
+      "Decoration": "Trang Trí"
+    }
+  },
+  "products_page": {
+    "title_our": "Cửa Hàng",
+    "title_collection": "Của Chúng Tôi",
+    "discover_desc": "Khám phá {{total}} sản phẩm cao cấp được tuyển chọn dành riêng cho bạn.",
+    "essential": "Cơ Bản",
+    "profile": "Hồ Sơ"
   }
 }
