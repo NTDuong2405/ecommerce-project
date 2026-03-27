@@ -6,13 +6,13 @@ import { useCart } from '../context/CartContext';
 import CustomerNotificationBell from './CustomerNotificationBell';
 import { useTranslation } from 'react-i18next';
 
-const CATEGORIES = ['Fashion', 'Tech', 'Accessories', 'Beauty', 'Home'];
+const CATEGORIES = ['Clothing', 'Shoes', 'Bags', 'Accessories', 'Tech'];
 const SUB_CATEGORY_MAP = {
-  Fashion: ['Áo Dài', 'Streetwear', 'Pants', 'T-Shirt', 'Polo'],
-  Tech: ['Smartphone', 'Audio', 'Laptop', 'Smart Home'],
-  Accessories: ['Watch', 'Bag', 'Jewelry'],
-  Beauty: ['Skincare', 'Makeup', 'Body Care'],
-  Home: ['Pottery/Basket', 'Vase', 'Furniture', 'Decoration']
+  Clothing: ['Streetwear', 'Pants', 'T-Shirt', 'Polo'],
+  Shoes: ['Sneakers', 'Boots', 'Sandals'],
+  Bags: ['Handbag', 'Backpack', 'Wallet'],
+  Accessories: ['Watch', 'Jewelry', 'Glasses'],
+  Tech: ['Smartphone', 'Audio', 'Laptop']
 };
 
 const Navbar = () => {
@@ -21,18 +21,27 @@ const Navbar = () => {
   const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('Fashion');
+  const [activeCategory, setActiveCategory] = useState('Clothing');
   const [catProducts, setCatProducts] = useState({});
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const fetchProductsPreview = async (cat) => {
     if (catProducts[cat]) return;
+    setPreviewLoading(true);
     try {
       const res = await api.get(`/products?category=${cat}&limit=4`);
       setCatProducts(prev => ({ ...prev, [cat]: res.data.data.data || [] }));
     } catch (err) {
       console.error("Fetch cat products error:", err);
+    } finally {
+      setPreviewLoading(false);
     }
   };
+
+  // Pre-fetch default category on mount
+  useEffect(() => {
+    fetchProductsPreview('Clothing');
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -148,7 +157,15 @@ const Navbar = () => {
                 <div className="flex-1 px-6 py-2 animate-fade-in overflow-y-auto max-h-[400px]">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{t('filter.recent', { category: t(`categories.${activeCategory}`) })}</div>
                   <div className="grid grid-cols-2 gap-4">
-                    {(catProducts[activeCategory] || []).length > 0 ? (
+                    {previewLoading ? (
+                      Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="flex flex-col gap-2 animate-pulse">
+                          <div className="aspect-square rounded-xl bg-slate-100" />
+                          <div className="h-3 bg-slate-100 rounded w-3/4" />
+                          <div className="h-2 bg-slate-100 rounded w-1/4" />
+                        </div>
+                      ))
+                    ) : (catProducts[activeCategory] || []).length > 0 ? (
                        catProducts[activeCategory].map(p => (
                          <Link 
                           key={p.id} 

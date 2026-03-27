@@ -133,7 +133,7 @@
     "Shoes": "Shoes",
     "Clothing": "Clothing",
     "Bags": "Bags",
-    "Fashion_items": {
+    "Clothing_items": {
       "Áo Dài": "Áo Dài",
       "Streetwear": "Streetwear",
       "Pants": "Pants",
@@ -143,8 +143,17 @@
     "Tech_items": {
       "Smartphone": "Smartphone",
       "Audio": "Audio",
-      "Laptop": "Laptop",
-      "Smart Home": "Smart Home"
+      "Laptop": "Laptop"
+    },
+    "Shoes_items": {
+      "Sneakers": "Sneakers",
+      "Boots": "Boots",
+      "Sandals": "Sandals"
+    },
+    "Bags_items": {
+      "Handbag": "Handbag",
+      "Backpack": "Backpack",
+      "Wallet": "Wallet"
     },
     "Accessories_items": {
       "Watch": "Watch",

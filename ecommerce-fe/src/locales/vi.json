@@ -128,7 +128,7 @@
     "Shoes": "Giày Dép",
     "Clothing": "Quần Áo",
     "Bags": "Túi Xách",
-    "Fashion_items": {
+    "Clothing_items": {
       "Áo Dài": "Áo Dài",
       "Streetwear": "Thời Trang Đường Phố",
       "Pants": "Quần",
@@ -138,8 +138,17 @@
     "Tech_items": {
       "Smartphone": "Điện Thoại",
       "Audio": "Âm Thanh",
-      "Laptop": "Máy Tính Xách Tay",
-      "Smart Home": "Nhà Thông Minh"
+      "Laptop": "Máy Tính Xách Tay"
+    },
+    "Shoes_items": {
+      "Sneakers": "Giày Sneakers",
+      "Boots": "Giày Boots",
+      "Sandals": "Sandal/Dép"
+    },
+    "Bags_items": {
+      "Handbag": "Túi Xách Tay",
+      "Backpack": "Balo",
+      "Wallet": "Ví/Bóp"
     },
     "Accessories_items": {
       "Watch": "Đồng Hồ",
