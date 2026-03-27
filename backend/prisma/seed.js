@@ -34,21 +34,21 @@ async function main() {
 
     // 3. DANH SÁCH SẢN PHẨM "THẬT" (30 products)
     const realProducts = [
-      { name: 'Nike Air Force 1 07', cat: 'Shoes', price: 110, img: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&q=80' },
-      { name: 'Adidas Ultraboost 22', cat: 'Shoes', price: 190, img: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500&q=80' },
-      { name: 'Jordan 1 Retro High', cat: 'Shoes', price: 170, img: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&q=80' },
-      { name: 'Yeezy Boost 350', cat: 'Shoes', price: 230, img: 'https://images.unsplash.com/photo-1586525198428-225f6f12cff5?w=500&q=80' },
-      { name: 'Gucci Marmont Bag', cat: 'Bags', price: 2500, img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&q=80' },
-      { name: 'LV Neverfull MM', cat: 'Bags', price: 2100, img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80' },
-      { name: 'Prada Cleo Bag', cat: 'Bags', price: 2800, img: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=500&q=80' },
-      { name: 'Hermes Birkin 25', cat: 'Bags', price: 9500, img: 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=500&q=80' },
-      { name: 'Rolex Submariner', cat: 'Accessories', price: 12000, img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80' },
-      { name: 'Apple Watch Ultra', cat: 'Accessories', price: 799, img: 'https://images.unsplash.com/photo-1434493907317-a46b5bc78344?w=500&q=80' },
-      { name: 'Ray-Ban Aviator', cat: 'Accessories', price: 160, img: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80' },
-      { name: 'Supreme Box Logo Tee', cat: 'Clothing', price: 400, img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80' },
-      { name: 'Off-White Hoodie', cat: 'Clothing', price: 550, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80' },
-      { name: 'Levi 501 Original', cat: 'Clothing', price: 80, img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&q=80' },
-      { name: 'TNF Mountain Jacket', cat: 'Clothing', price: 350, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&q=80' },
+      { name: 'Nike Air Force 1 07', cat: 'Shoes', sub: 'Sneakers', price: 110, img: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&q=80' },
+      { name: 'Adidas Ultraboost 22', cat: 'Shoes', sub: 'Sneakers', price: 190, img: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500&q=80' },
+      { name: 'Jordan 1 Retro High', cat: 'Shoes', sub: 'Sneakers', price: 170, img: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&q=80' },
+      { name: 'Yeezy Boost 350', cat: 'Shoes', sub: 'Sneakers', price: 230, img: 'https://images.unsplash.com/photo-1586525198428-225f6f12cff5?w=500&q=80' },
+      { name: 'Gucci Marmont Bag', cat: 'Bags', sub: 'Handbag', price: 2500, img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&q=80' },
+      { name: 'LV Neverfull MM', cat: 'Bags', sub: 'Handbag', price: 2100, img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80' },
+      { name: 'Prada Cleo Bag', cat: 'Bags', sub: 'Handbag', price: 2800, img: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=500&q=80' },
+      { name: 'Hermes Birkin 25', cat: 'Bags', sub: 'Handbag', price: 9500, img: 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=500&q=80' },
+      { name: 'Rolex Submariner', cat: 'Accessories', sub: 'Watch', price: 12000, img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80' },
+      { name: 'Apple Watch Ultra', cat: 'Accessories', sub: 'Watch', price: 799, img: 'https://images.unsplash.com/photo-1434493907317-a46b5bc78344?w=500&q=80' },
+      { name: 'Ray-Ban Aviator', cat: 'Accessories', sub: 'Glasses', price: 160, img: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80' },
+      { name: 'Supreme Box Logo Tee', cat: 'Clothing', sub: 'T-Shirt', price: 400, img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80' },
+      { name: 'Off-White Hoodie', cat: 'Clothing', sub: 'Streetwear', price: 550, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80' },
+      { name: 'Levi 501 Original', cat: 'Clothing', sub: 'Pants', price: 80, img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&q=80' },
+      { name: 'Polo Ralph Lauren', cat: 'Clothing', sub: 'Polo', price: 120, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&q=80' },
     ];
 
     const products = [];
@@ -57,6 +57,7 @@ async function main() {
         data: {
           name: p.name,
           category: p.cat,
+          subCategory: p.sub || null,
           price: p.price,
           stock: 50,
           description: `Sản phẩm cao cấp ${p.name} chuẩn quốc tế.`,
@@ -74,6 +75,7 @@ async function main() {
           data: {
             name: `${source.name} Edition ${i}`,
             category: source.cat,
+            subCategory: source.sub || null,
             price: source.price + 10,
             stock: 30,
             description: `Phiên bản giới hạn của ${source.name}.`,
